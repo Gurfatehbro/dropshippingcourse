@@ -572,7 +572,10 @@ Link: http://localhost:3000</div>
           </div>
           
           <div>
-            <button class="btn btn-secondary" style="width: 100%; font-size: 0.8rem;" onclick="testCapiEvent()">⚡ Send Test Event to Meta</button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-primary" style="flex: 1; font-size: 0.78rem; background: #059669;" onclick="testCapiEvent('Purchase')">💳 Send Test Purchase (₹199)</button>
+              <button class="btn btn-secondary" style="flex: 1; font-size: 0.78rem;" onclick="testCapiEvent('InitiateCheckout')">⚡ Test Checkout</button>
+            </div>
             <div id="capiTestResult" style="font-size: 0.75rem; margin-top: 6px; word-break: break-all;"></div>
           </div>
         </div>
@@ -762,10 +765,10 @@ Link: http://localhost:3000</div>
       }
     }
 
-    async function testCapiEvent() {
+    async function testCapiEvent(eventName = 'Purchase') {
       const passcode = getSavedPasscode();
       const resultEl = document.getElementById('capiTestResult');
-      resultEl.innerHTML = '<span style="color: #60a5fa;">⏳ Sending test InitiateCheckout event to Meta...</span>';
+      resultEl.innerHTML = `<span style="color: #60a5fa;">⏳ Sending test ${eventName} event to Meta...</span>`;
 
       try {
         const res = await fetch('/api/admin/capi-test', {
@@ -773,13 +776,14 @@ Link: http://localhost:3000</div>
           headers: {
             'Content-Type': 'application/json',
             'X-Admin-Passcode': passcode
-          }
+          },
+          body: JSON.stringify({ event_name: eventName })
         });
         const data = await res.json();
         if (data.skipped) {
           resultEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Notice: Please paste your Meta CAPI Access Token first, then click Save.</span>';
         } else if (data.success) {
-          resultEl.innerHTML = '<span style="color: #10b981;">✅ Meta accepted event! Events Received: ' + (data.data?.events_received || 1) + '</span>';
+          resultEl.innerHTML = `<span style="color: #10b981;">✅ Meta accepted ${eventName} event! Events Received: ${data.data?.events_received || 1}</span>`;
         } else {
           const errMsg = data.data?.error?.message || data.error || 'Meta returned error';
           resultEl.innerHTML = '<span style="color: #ef4444;">❌ ' + escapeHtml(errMsg) + '</span>';

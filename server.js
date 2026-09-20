@@ -359,9 +359,12 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const testRes = await sendMetaCapiEvent('InitiateCheckout', `test_${Date.now()}`, {
-      name: 'Test Customer',
-      email: 'test@example.com',
+    const data = await parseBody(req);
+    const eventName = data.event_name || 'Purchase';
+
+    const testRes = await sendMetaCapiEvent(eventName, `test_pur_${Date.now()}`, {
+      name: 'Gurfateh Singh',
+      email: 'fatehxgames12@gmail.com',
       phone: '9876543210',
       amount: 199.00
     }, req);
