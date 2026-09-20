@@ -82,7 +82,7 @@ function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, cur
         event_name: eventName,
         event_time: Math.floor(Date.now() / 1000),
         event_id: eventId || `ev_${Date.now()}`,
-        event_source_url: (req && req.headers && (req.headers.referer || req.headers.origin)) || 'http://localhost:3000',
+        event_source_url: (req && req.headers && (req.headers.referer || req.headers.origin)) || 'https://intdropshippingcourse.vercel.app',
         action_source: 'website',
         user_data: userData,
         custom_data: {
