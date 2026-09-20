@@ -5,23 +5,38 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const ORDERS_FILE = path.join(__dirname, 'orders.json');
-const CAPI_CONFIG_FILE = path.join(__dirname, 'capi_config.json');
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const ORDERS_FILE = isVercel ? path.join('/tmp', 'orders.json') : path.join(__dirname, 'orders.json');
+const CAPI_CONFIG_FILE = isVercel ? path.join('/tmp', 'capi_config.json') : path.join(__dirname, 'capi_config.json');
 
 function readCapiConfig() {
   try {
     if (!fs.existsSync(CAPI_CONFIG_FILE)) {
+      const seedFile = path.join(__dirname, 'capi_config.json');
+      if (isVercel && fs.existsSync(seedFile)) {
+        try {
+          const content = fs.readFileSync(seedFile, 'utf8');
+          fs.writeFileSync(CAPI_CONFIG_FILE, content, 'utf8');
+          return JSON.parse(content);
+        } catch (e) {}
+      }
       const defaultCfg = {
         pixel_id: process.env.FB_PIXEL_ID || '4879107795666392',
-        access_token: process.env.FB_ACCESS_TOKEN || '',
-        test_code: process.env.FB_TEST_CODE || ''
+        access_token: process.env.FB_ACCESS_TOKEN || 'EAAdOWKUvli0BSivPSn2YSZBOEKxsr71ZCQtWhH9SQhpa6CPPjftvtHqYPLwxds1evdaIkTZBk2mLn1vsYQXZBKpVZAiVvIO2NpIKDIxEEtAi28GfrZAd9fYAHFuscrWFI7nAW0oZA6xoqMmUUQP7vZCBPFUNvWaE2YRwLqkB1t1XdPsa9bmcjDrdxHGsZA9eZB2wZDZD',
+        test_code: process.env.FB_TEST_CODE || 'TEST69070'
       };
-      fs.writeFileSync(CAPI_CONFIG_FILE, JSON.stringify(defaultCfg, null, 2));
+      try {
+        fs.writeFileSync(CAPI_CONFIG_FILE, JSON.stringify(defaultCfg, null, 2), 'utf8');
+      } catch (e) {}
       return defaultCfg;
     }
     return JSON.parse(fs.readFileSync(CAPI_CONFIG_FILE, 'utf8') || '{}');
   } catch (e) {
-    return { pixel_id: '4879107795666392', access_token: '', test_code: '' };
+    return {
+      pixel_id: '4879107795666392',
+      access_token: 'EAAdOWKUvli0BSivPSn2YSZBOEKxsr71ZCQtWhH9SQhpa6CPPjftvtHqYPLwxds1evdaIkTZBk2mLn1vsYQXZBKpVZAiVvIO2NpIKDIxEEtAi28GfrZAd9fYAHFuscrWFI7nAW0oZA6xoqMmUUQP7vZCBPFUNvWaE2YRwLqkB1t1XdPsa9bmcjDrdxHGsZA9eZB2wZDZD',
+      test_code: 'TEST69070'
+    };
   }
 }
 
@@ -157,7 +172,17 @@ const MIME_TYPES = {
 function readOrders() {
   try {
     if (!fs.existsSync(ORDERS_FILE)) {
-      fs.writeFileSync(ORDERS_FILE, JSON.stringify([]));
+      const seedFile = path.join(__dirname, 'orders.json');
+      if (isVercel && fs.existsSync(seedFile)) {
+        try {
+          const content = fs.readFileSync(seedFile, 'utf8');
+          fs.writeFileSync(ORDERS_FILE, content, 'utf8');
+          return JSON.parse(content);
+        } catch (e) {}
+      }
+      try {
+        fs.writeFileSync(ORDERS_FILE, JSON.stringify([]));
+      } catch (e) {}
     }
     const data = fs.readFileSync(ORDERS_FILE, 'utf8');
     return JSON.parse(data || '[]');
@@ -176,11 +201,21 @@ function saveOrders(orders) {
 
 function parseBody(req) {
   return new Promise((resolve) => {
+    if (req.body) {
+      if (typeof req.body === 'object') return resolve(req.body);
+      if (typeof req.body === 'string') {
+        try {
+          return resolve(JSON.parse(req.body));
+        } catch (e) {
+          return resolve({});
+        }
+      }
+    }
     let body = '';
     req.on('data', chunk => body += chunk);
     req.on('end', () => {
       try {
-        resolve(JSON.parse(body || '{}'));
+        resolve(body ? JSON.parse(body) : {});
       } catch (e) {
         resolve({});
       }
@@ -188,11 +223,11 @@ function parseBody(req) {
   });
 }
 
-const server = http.createServer(async (req, res) => {
+async function handleRequest(req, res) {
   // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Passcode, Authorization');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
@@ -200,11 +235,12 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  const urlParts = (req.url || '/').split('?');
+  const rawUrl = req.headers['x-matched-path'] || req.url || '/';
+  const urlParts = rawUrl.split('?');
   const reqPath = urlParts[0];
 
   // API 1: Initiate Order / Record Abandoned Lead & Trigger CAPI
-  if (reqPath === '/api/order/initiate' && req.method === 'POST') {
+  if ((reqPath === '/api/order/initiate' || reqPath.endsWith('/order/initiate')) && req.method === 'POST') {
     const data = await parseBody(req);
     const orders = readOrders();
 
@@ -238,7 +274,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // API 2: Mark Order as Paid & Trigger CAPI Purchase
-  if (reqPath === '/api/order/complete' && req.method === 'POST') {
+  if ((reqPath === '/api/order/complete' || reqPath.endsWith('/order/complete')) && req.method === 'POST') {
     const data = await parseBody(req);
     const orders = readOrders();
 
@@ -287,7 +323,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // API 3: Get All Orders for Admin Dashboard
-  if (reqPath === '/api/admin/orders' && req.method === 'GET') {
+  if ((reqPath === '/api/admin/orders' || reqPath.endsWith('/admin/orders')) && req.method === 'GET') {
     const authHeader = req.headers['x-admin-passcode'] || '';
     const searchParams = new URL(req.url, 'http://localhost').searchParams;
     const queryPass = searchParams.get('passcode') || '';
@@ -319,7 +355,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // API 4: Get & Update Meta CAPI Settings
-  if (reqPath === '/api/admin/capi-settings') {
+  if (reqPath === '/api/admin/capi-settings' || reqPath.endsWith('/admin/capi-settings')) {
     const authHeader = req.headers['x-admin-passcode'] || '';
     if (authHeader !== 'dropshippingadmin') {
       res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -354,7 +390,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // API 5: Send Test Event to Meta Conversions API
-  if (reqPath === '/api/admin/capi-test' && req.method === 'POST') {
+  if ((reqPath === '/api/admin/capi-test' || reqPath.endsWith('/admin/capi-test')) && req.method === 'POST') {
     const authHeader = req.headers['x-admin-passcode'] || '';
     if (authHeader !== 'dropshippingadmin') {
       res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -377,7 +413,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Static File Serving & Admin Route
+  // Static File Serving & Admin Route (Local Server)
   let targetPath = reqPath;
   if (targetPath === '/' || targetPath === '') {
     targetPath = '/index.html';
@@ -403,9 +439,15 @@ const server = http.createServer(async (req, res) => {
       res.end(content);
     }
   });
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`Landing Page Server running at http://localhost:${PORT}`);
-  console.log(`Admin Panel available at http://localhost:${PORT}/admin`);
-});
+const server = http.createServer(handleRequest);
+
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Landing Page Server running at http://localhost:${PORT}`);
+    console.log(`Admin Panel available at http://localhost:${PORT}/admin`);
+  });
+}
+
+module.exports = handleRequest;
