@@ -82,7 +82,7 @@ window.addEventListener('scroll', () => {
 // Connected to your Live Razorpay Account:
 window.RAZORPAY_CONFIG = {
   key_id: "rzp_live_TbXpMHWLFUG29I", // Your Live Razorpay Key
-  amount: 100,                      // 100 paise = ₹1 (Testing Mode)
+  amount: 19900,                    // 19900 paise = ₹199
   currency: "INR",
   name: "Dropship India",
   description: "International Dropshipping Blueprint (PDF + 5 Bonuses)",
@@ -141,7 +141,7 @@ function handleCheckout(event) {
       modal: {
         ondismiss: function() {
           btn.disabled = false;
-          btn.textContent = "Pay ₹1 & Complete Order →";
+          btn.textContent = "Pay ₹199 & Complete Order →";
         }
       }
     };
@@ -165,7 +165,7 @@ function showOrderSuccess(name, email, paymentId, isDemo = false) {
       </div>
       <h3 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Payment Successful!</h3>
       <p style="font-size: 0.9375rem; color: #475569; margin-bottom: 20px;">
-        Thank you, <strong>${name}</strong>! Your transaction <code>${paymentId}</code> of <strong>₹1</strong> is verified.
+        Thank you, <strong>${name}</strong>! Your transaction <code>${paymentId}</code> of <strong>₹199</strong> is verified.
       </p>
 
       ${isDemo ? `
