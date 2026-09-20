@@ -539,6 +539,42 @@ Agar payment me koi issue aa raha tha (UPI ya Card), to batayein I can help you 
 Link: http://localhost:3000</div>
           </div>
           <button class="copy-btn" onclick="copyText('script2')">Copy Message</button>
+    </section>
+
+    <!-- Meta Pixel & Conversions API (CAPI) Control Box -->
+    <section class="scripts-banner" style="border-color: rgba(59, 130, 246, 0.4); margin-bottom: 28px;">
+      <div class="scripts-header">
+        <div class="scripts-title">
+          <span>🎯 Meta Pixel & Conversions API (CAPI) Engine</span>
+          <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 800; margin-left: 8px;">ACTIVE</span>
+        </div>
+        <span style="font-size: 0.8rem; color: var(--text-light);">Pixel ID: <strong style="color: #60a5fa;" id="capiPixelIdDisplay">4879107795666392</strong></span>
+      </div>
+
+      <div style="margin-top: 16px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;">
+        <div style="background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--surface-border);">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">Conversions API Access Token</div>
+          <input type="password" id="capiAccessTokenInput" class="search-input" style="width: 100%; margin-bottom: 12px; font-family: monospace; font-size: 0.8rem;" placeholder="Paste Meta CAPI Access Token (EAAB...)">
+          
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-primary" style="padding: 7px 14px; font-size: 0.8rem;" onclick="saveCapiSettings()">Save Settings</button>
+            <span id="capiSaveStatus" style="font-size: 0.78rem; color: #10b981;"></span>
+          </div>
+          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 8px;">
+            Get token from: Meta Events Manager &gt; Pixel Settings &gt; Conversions API &gt; "Generate access token"
+          </div>
+        </div>
+
+        <div style="background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--surface-border); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">Test Event Code (Optional)</div>
+            <input type="text" id="capiTestCodeInput" class="search-input" style="width: 100%; margin-bottom: 12px; font-size: 0.8rem;" placeholder="e.g. TEST12345 (from Test Events tab)">
+          </div>
+          
+          <div>
+            <button class="btn btn-secondary" style="width: 100%; font-size: 0.8rem;" onclick="testCapiEvent()">⚡ Send Test Event to Meta</button>
+            <div id="capiTestResult" style="font-size: 0.75rem; margin-top: 6px; word-break: break-all;"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -598,6 +634,7 @@ Link: http://localhost:3000</div>
         overlay.style.display = 'none';
         content.style.display = 'block';
         loadOrders();
+        loadCapiSettings();
         return true;
       } else {
         overlay.style.display = 'flex';
@@ -662,6 +699,93 @@ Link: http://localhost:3000</div>
         }
       } catch (err) {
         console.error('Failed to load orders:', err);
+      }
+    }
+
+    async function loadCapiSettings() {
+      const passcode = getSavedPasscode();
+      if (!passcode) return;
+
+      try {
+        const res = await fetch('/api/admin/capi-settings', {
+          headers: { 'X-Admin-Passcode': passcode }
+        });
+        const data = await res.json();
+        if (data.success) {
+          const pixelEl = document.getElementById('capiPixelIdDisplay');
+          if (pixelEl) pixelEl.textContent = data.pixel_id || '4879107795666392';
+          const tokenInput = document.getElementById('capiAccessTokenInput');
+          if (tokenInput && data.has_token) {
+            tokenInput.placeholder = '● Token active & configured (paste to overwrite)';
+          }
+          const testInput = document.getElementById('capiTestCodeInput');
+          if (testInput && data.test_code) {
+            testInput.value = data.test_code;
+          }
+        }
+      } catch (e) {
+        console.warn('Error loading CAPI settings:', e.message);
+      }
+    }
+
+    async function saveCapiSettings() {
+      const passcode = getSavedPasscode();
+      const token = document.getElementById('capiAccessTokenInput').value.trim();
+      const testCode = document.getElementById('capiTestCodeInput').value.trim();
+      const statusEl = document.getElementById('capiSaveStatus');
+
+      try {
+        const res = await fetch('/api/admin/capi-settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Passcode': passcode
+          },
+          body: JSON.stringify({
+            access_token: token || undefined,
+            test_code: testCode
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          statusEl.textContent = '✓ Saved successfully!';
+          statusEl.style.color = '#10b981';
+          setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
+          loadCapiSettings();
+        } else {
+          statusEl.textContent = '❌ Failed to save';
+          statusEl.style.color = '#ef4444';
+        }
+      } catch (e) {
+        statusEl.textContent = '❌ Failed to save';
+        statusEl.style.color = '#ef4444';
+      }
+    }
+
+    async function testCapiEvent() {
+      const passcode = getSavedPasscode();
+      const resultEl = document.getElementById('capiTestResult');
+      resultEl.innerHTML = '<span style="color: #60a5fa;">⏳ Sending test InitiateCheckout event to Meta...</span>';
+
+      try {
+        const res = await fetch('/api/admin/capi-test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Passcode': passcode
+          }
+        });
+        const data = await res.json();
+        if (data.skipped) {
+          resultEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Notice: Please paste your Meta CAPI Access Token first, then click Save.</span>';
+        } else if (data.success) {
+          resultEl.innerHTML = '<span style="color: #10b981;">✅ Meta accepted event! Events Received: ' + (data.data?.events_received || 1) + '</span>';
+        } else {
+          const errMsg = data.data?.error?.message || data.error || 'Meta returned error';
+          resultEl.innerHTML = '<span style="color: #ef4444;">❌ ' + escapeHtml(errMsg) + '</span>';
+        }
+      } catch (e) {
+        resultEl.innerHTML = '<span style="color: #ef4444;">❌ Request failed: ' + escapeHtml(e.message) + '</span>';
       }
     }
 

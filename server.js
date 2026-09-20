@@ -1,9 +1,146 @@
 const http = require('http');
+const https = require('https');
+const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
+const CAPI_CONFIG_FILE = path.join(__dirname, 'capi_config.json');
+
+function readCapiConfig() {
+  try {
+    if (!fs.existsSync(CAPI_CONFIG_FILE)) {
+      const defaultCfg = {
+        pixel_id: process.env.FB_PIXEL_ID || '4879107795666392',
+        access_token: process.env.FB_ACCESS_TOKEN || '',
+        test_code: process.env.FB_TEST_CODE || ''
+      };
+      fs.writeFileSync(CAPI_CONFIG_FILE, JSON.stringify(defaultCfg, null, 2));
+      return defaultCfg;
+    }
+    return JSON.parse(fs.readFileSync(CAPI_CONFIG_FILE, 'utf8') || '{}');
+  } catch (e) {
+    return { pixel_id: '4879107795666392', access_token: '', test_code: '' };
+  }
+}
+
+function saveCapiConfig(cfg) {
+  try {
+    fs.writeFileSync(CAPI_CONFIG_FILE, JSON.stringify(cfg, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Error saving capi config:', e.message);
+  }
+}
+
+function hashSha256(str) {
+  if (!str) return null;
+  return crypto.createHash('sha256').update(String(str).trim().toLowerCase()).digest('hex');
+}
+
+function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, currency }, req) {
+  return new Promise((resolve) => {
+    const config = readCapiConfig();
+    const pixelId = config.pixel_id || '4879107795666392';
+    const accessToken = config.access_token || process.env.FB_ACCESS_TOKEN || '';
+
+    if (!accessToken) {
+      console.log(`[Meta CAPI] Skipping ${eventName} (${eventId}): No access token provided yet.`);
+      resolve({ skipped: true, reason: 'Access token not configured' });
+      return;
+    }
+
+    try {
+      const userData = {};
+
+      if (email && email.includes('@')) {
+        userData.em = [hashSha256(email)];
+      }
+
+      if (phone) {
+        let cleanPhone = String(phone).replace(/[^0-9]/g, '');
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+        userData.ph = [hashSha256(cleanPhone)];
+      }
+
+      if (name) {
+        const firstName = name.trim().split(' ')[0].toLowerCase();
+        userData.fn = [hashSha256(firstName)];
+      }
+
+      if (req && req.headers) {
+        const rawIp = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || (req.socket && req.socket.remoteAddress);
+        if (rawIp) {
+          userData.client_ip_address = String(rawIp).split(',')[0].trim();
+        }
+        if (req.headers['user-agent']) {
+          userData.client_user_agent = req.headers['user-agent'];
+        }
+      }
+
+      const eventItem = {
+        event_name: eventName,
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: eventId || `ev_${Date.now()}`,
+        event_source_url: (req && req.headers && (req.headers.referer || req.headers.origin)) || 'http://localhost:3000',
+        action_source: 'website',
+        user_data: userData,
+        custom_data: {
+          currency: currency || 'INR',
+          value: Number(amount) || 199.00,
+          content_name: 'International Dropshipping Blueprint (PDF + 5 Bonuses)',
+          content_type: 'product'
+        }
+      };
+
+      const payload = {
+        data: [eventItem]
+      };
+
+      if (config.test_code) {
+        payload.test_event_code = config.test_code;
+      }
+
+      const payloadString = JSON.stringify(payload);
+      const postReq = https.request(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payloadString)
+        },
+        timeout: 5000
+      }, (postRes) => {
+        let resBody = '';
+        postRes.on('data', chunk => (resBody += chunk));
+        postRes.on('end', () => {
+          try {
+            const parsed = JSON.parse(resBody);
+            console.log(`[Meta CAPI ${eventName}] Status ${postRes.statusCode}:`, resBody);
+            resolve({ success: postRes.statusCode === 200, statusCode: postRes.statusCode, data: parsed });
+          } catch (e) {
+            resolve({ success: postRes.statusCode === 200, statusCode: postRes.statusCode, raw: resBody });
+          }
+        });
+      });
+
+      postReq.on('error', (err) => {
+        console.error(`[Meta CAPI ${eventName}] Error:`, err.message);
+        resolve({ success: false, error: err.message });
+      });
+
+      postReq.on('timeout', () => {
+        postReq.destroy();
+        resolve({ success: false, error: 'Timeout' });
+      });
+
+      postReq.write(payloadString);
+      postReq.end();
+    } catch (e) {
+      console.error(`[Meta CAPI] Exception:`, e.message);
+      resolve({ success: false, error: e.message });
+    }
+  });
+}
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -65,7 +202,7 @@ const server = http.createServer(async (req, res) => {
   const urlParts = (req.url || '/').split('?');
   const reqPath = urlParts[0];
 
-  // API 1: Initiate Order / Record Abandoned Lead
+  // API 1: Initiate Order / Record Abandoned Lead & Trigger CAPI
   if (reqPath === '/api/order/initiate' && req.method === 'POST') {
     const data = await parseBody(req);
     const orders = readOrders();
@@ -85,12 +222,20 @@ const server = http.createServer(async (req, res) => {
     orders.unshift(newOrder);
     saveOrders(orders);
 
+    // Trigger Meta Conversions API (CAPI) InitiateCheckout
+    sendMetaCapiEvent('InitiateCheckout', data.eventId, {
+      name: newOrder.name,
+      email: newOrder.email,
+      phone: newOrder.phone,
+      amount: 199.00
+    }, req).catch(err => console.warn('CAPI InitiateCheckout note:', err.message));
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, orderId: newOrder.id }));
     return;
   }
 
-  // API 2: Mark Order as Paid
+  // API 2: Mark Order as Paid & Trigger CAPI Purchase
   if (reqPath === '/api/order/complete' && req.method === 'POST') {
     const data = await parseBody(req);
     const orders = readOrders();
@@ -124,6 +269,15 @@ const server = http.createServer(async (req, res) => {
     }
 
     saveOrders(orders);
+
+    // Trigger Meta Conversions API (CAPI) Purchase
+    sendMetaCapiEvent('Purchase', data.eventId, {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      amount: 199.00
+    }, req).catch(err => console.warn('CAPI Purchase note:', err.message));
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true }));
     return;
@@ -158,6 +312,62 @@ const server = http.createServer(async (req, res) => {
       },
       orders: orders
     }));
+    return;
+  }
+
+  // API 4: Get & Update Meta CAPI Settings
+  if (reqPath === '/api/admin/capi-settings') {
+    const authHeader = req.headers['x-admin-passcode'] || '';
+    if (authHeader !== 'dropshippingadmin') {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    if (req.method === 'GET') {
+      const cfg = readCapiConfig();
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        success: true,
+        pixel_id: cfg.pixel_id || '4879107795666392',
+        has_token: Boolean(cfg.access_token),
+        test_code: cfg.test_code || ''
+      }));
+      return;
+    }
+
+    if (req.method === 'POST') {
+      const data = await parseBody(req);
+      const cfg = readCapiConfig();
+      if (data.pixel_id) cfg.pixel_id = data.pixel_id.trim();
+      if (data.access_token !== undefined) cfg.access_token = data.access_token.trim();
+      if (data.test_code !== undefined) cfg.test_code = data.test_code.trim();
+      saveCapiConfig(cfg);
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Settings saved successfully' }));
+      return;
+    }
+  }
+
+  // API 5: Send Test Event to Meta Conversions API
+  if (reqPath === '/api/admin/capi-test' && req.method === 'POST') {
+    const authHeader = req.headers['x-admin-passcode'] || '';
+    if (authHeader !== 'dropshippingadmin') {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    const testRes = await sendMetaCapiEvent('InitiateCheckout', `test_${Date.now()}`, {
+      name: 'Test Customer',
+      email: 'test@example.com',
+      phone: '9876543210',
+      amount: 199.00
+    }, req);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(testRes));
     return;
   }
 

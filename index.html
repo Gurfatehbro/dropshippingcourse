@@ -14,6 +14,24 @@
   <!-- Razorpay SDK -->
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
+  <!-- Meta Pixel Code -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '4879107795666392');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=4879107795666392&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+
   <style>
     :root {
       --bg: #ffffff;
@@ -851,12 +869,31 @@
       btn.disabled = true;
       btn.textContent = "Opening Payment Gateway...";
 
-      // Record lead as Abandoned on server immediately
+      // Generate unique eventId for Meta CAPI & Pixel Deduplication
+      const checkoutEventId = 'ev_init_' + Date.now() + '_' + Math.random().toString(36).substr(2, 7);
+      window.lastCheckoutEventId = checkoutEventId;
+
+      // Meta Pixel: InitiateCheckout Event
+      try {
+        if (typeof window.fbq === 'function') {
+          window.fbq('track', 'InitiateCheckout', {
+            value: 199.00,
+            currency: 'INR',
+            content_name: 'International Dropshipping Blueprint (PDF + 5 Bonuses)',
+            content_type: 'product',
+            num_items: 1
+          }, { eventID: checkoutEventId });
+        }
+      } catch (fbErr) {
+        console.warn('Meta Pixel InitiateCheckout error:', fbErr.message);
+      }
+
+      // Record lead as Abandoned on server immediately & trigger Server CAPI
       try {
         const initRes = await fetch('/api/order/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone })
+          body: JSON.stringify({ name, email, phone, eventId: checkoutEventId })
         });
         const initData = await initRes.json();
         if (initData.success) {
@@ -906,7 +943,24 @@
             btn.disabled = false;
             btn.textContent = "Pay ₹199 & Download Blueprint →";
 
-            // Mark order as PAID on server
+            const purchaseEventId = 'ev_pur_' + (response.razorpay_payment_id || Date.now());
+
+            // Meta Pixel: Purchase Event (Browser deduplicated with CAPI)
+            try {
+              if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Purchase', {
+                  value: 199.00,
+                  currency: 'INR',
+                  content_name: 'International Dropshipping Blueprint (PDF + 5 Bonuses)',
+                  content_type: 'product',
+                  num_items: 1
+                }, { eventID: purchaseEventId });
+              }
+            } catch (fbErr) {
+              console.warn('Meta Pixel Purchase error:', fbErr.message);
+            }
+
+            // Mark order as PAID on server & trigger Server CAPI Purchase event
             try {
               await fetch('/api/order/complete', {
                 method: 'POST',
@@ -916,7 +970,8 @@
                   name: name,
                   email: email,
                   phone: phone,
-                  payment_id: response.razorpay_payment_id
+                  payment_id: response.razorpay_payment_id,
+                  eventId: purchaseEventId
                 })
               });
             } catch (e) {
