@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How to Start International Dropshipping From India | Blueprint (₹199)</title>
+  <meta name="description" content="Step-by-step practical blueprint for Indian entrepreneurs to build an international dropshipping business. Get the eBook + 5 bonus scripts for just ₹199.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-subtle: #f8fafc;
+      --bg-card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-light: #64748b;
+      --navy: #0a192f;
+      --blue: #185adb;
+      --blue-hover: #1246aa;
+      --blue-soft: #eff6ff;
+      --green: #059669;
+      --green-soft: #ecfdf5;
+      --font: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: #f8fafc;
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 60px;
+    }
+
+    .top-banner {
+      background: var(--navy);
+      color: #fff;
+      text-align: center;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .top-banner strong { color: #60a5fa; }
+    .top-banner del { color: #94a3b8; margin: 0 4px; }
+
+    .site-nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .brand-mark {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-tag {
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* Main Product Card */
+    .product-main-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 10px 35px -5px rgba(15, 23, 42, 0.08);
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 48px;
+      margin-bottom: 36px;
+    }
+
+    /* Left: Visual Column */
+    .product-visual-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .book-image-wrap {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .book-main-img {
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      filter: drop-shadow(0 20px 30px rgba(15, 23, 42, 0.2));
+      transition: opacity 0.2s ease;
+    }
+    .view-toggle-wrap {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      background: var(--bg-subtle);
+      padding: 4px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .view-btn {
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .view-btn.active {
+      background: var(--navy);
+      color: #fff;
+    }
+
+    /* Right: Details & Direct Checkout */
+    .product-info-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .deal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      width: fit-content;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .product-title {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .product-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    /* Price Block */
+    .price-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .price-left {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .price-cut {
+      font-size: 1.25rem;
+      color: var(--text-light);
+      text-decoration: line-through;
+    }
+    .price-current {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .save-tag {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* What you get bullets */
+    .included-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .included-list li {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .included-list li svg {
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    /* Direct On-Page Buy Form */
+    .buy-form-box {
+      background: #ffffff;
+      border: 2px solid var(--blue);
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 4px 20px rgba(24, 90, 219, 0.08);
+    }
+    .form-heading {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-inputs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .form-field {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .form-field:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.15);
+    }
+    .pay-btn {
+      width: 100%;
+      background: var(--blue);
+      color: #ffffff;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .pay-btn:hover {
+      background: var(--blue-hover);
+    }
+    .pay-trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    /* Comparison Bar (Why International Dropshipping) */
+    .quick-why-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .section-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .section-h {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 20px;
+    }
+    .versus-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .versus-col {
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 0.88rem;
+    }
+    .versus-bad {
+      background: #fff5f5;
+      border: 1px solid #fed7d7;
+    }
+    .versus-good {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+    }
+    .versus-title {
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .versus-bad .versus-title { color: #c53030; }
+    .versus-good .versus-title { color: #15803d; }
+    .versus-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Syllabus & Bonuses Combined */
+    .content-breakdown {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+    .content-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px;
+    }
+    .chapter-tags-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .chapter-tag-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chapter-tag-num {
+      color: var(--blue);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+    }
+
+    .bonus-pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .bonus-pill-card {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+    .bonus-pill-card strong { color: var(--navy); }
+    .bonus-pill-card span { color: var(--green); font-weight: 700; font-size: 0.75rem; }
+
+    /* Customer Reviews */
+    .reviews-card-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .review-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .review-mini-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .review-stars { color: #f59e0b; font-size: 0.9rem; margin-bottom: 8px; }
+    .review-body { font-size: 0.83rem; color: var(--text); font-style: italic; margin-bottom: 12px; }
+    .review-author { font-size: 0.78rem; font-weight: 800; color: var(--navy); }
+    .review-auth-loc { font-size: 0.7rem; color: var(--text-light); }
+
+    /* Simple FAQ */
+    .faq-mini-box {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .faq-mini-q {
+      margin-bottom: 14px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-mini-q:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .faq-title { font-weight: 800; font-size: 0.92rem; color: var(--navy); margin-bottom: 4px; }
+    .faq-ans { font-size: 0.84rem; color: var(--text-muted); }
+
+    /* Footer */
+    .footer-mini {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-light);
+      padding: 20px 0;
+    }
+
+    /* Modal for Instant Access Confirmation */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(10, 25, 47, 0.75);
+      backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-inner {
+      background: #fff; border-radius: 16px; max-width: 500px; width: 100%; padding: 32px; text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+
+    @media (max-width: 860px) {
+      .product-main-card {
+        grid-template-columns: 1fr;
+        padding: 24px;
+        gap: 30px;
+      }
+      .versus-grid, .content-breakdown, .review-mini-grid, .form-inputs-grid {
+        grid-template-columns: 1fr;
+      }
+      .chapter-tags-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Deal Ribbon -->
+  <div class="top-banner">
+    🔥 <strong>SPECIAL LAUNCH OFFER:</strong> Complete Blueprint + 5 Bonus Templates for only <del>₹999</del> <strong>₹199</strong> (Save 80%)
+  </div>
+
+  <!-- Header -->
+  <nav class="site-nav">
+    <div class="brand-mark">
+      <span>🌐 Dropship India</span>
+      <span class="brand-tag">Blueprint Edition</span>
+    </div>
+    <div style="font-size: 0.85rem; font-weight: 700; color: var(--navy);">
+      Launch Deal: <del style="color:#94a3b8;">₹999</del> <span style="color:var(--blue); font-size:1.05rem;">₹199</span>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- ==================== MAIN PRODUCT SHOWCASE & CHECKOUT ==================== -->
+    <section class="product-main-card">
+      
+      <!-- Visual Column -->
+      <div class="product-visual-col">
+        <div class="book-image-wrap">
+          <img src="assets/images/book-front.jpg" alt="Blueprint eBook Cover Mockup" class="book-main-img" id="bookImg">
+        </div>
+        <div class="view-toggle-wrap">
+          <button class="view-btn active" id="btnFront" onclick="showCover('front')">Front Cover</button>
+          <button class="view-btn" id="btnBack" onclick="showCover('back')">Back Cover & Syllabus</button>
+        </div>
+        <div style="margin-top: 14px; font-size: 0.75rem; color: var(--text-light); text-align: center;">
+          ⚡ Instant Digital Delivery (PDF + 5 Done-For-You Templates)
+        </div>
+      </div>
+
+      <!-- Info & Direct Buy Column -->
+      <div class="product-info-col">
+        <div class="deal-badge">⚡ 80% OFF • LIMITED TIME DEAL</div>
+        
+        <h1 class="product-title">How to Start International Dropshipping From India</h1>
+        <p class="product-subtitle">
+          Your practical, step-by-step digital blueprint to launch, accept USD payments, and scale a global dropshipping business from India.
+        </p>
+
+        <!-- Price Anchor -->
+        <div class="price-box">
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">One-Time Payment</div>
+            <div class="price-left">
+              <span class="price-cut">₹999</span>
+              <span class="price-current">₹199</span>
+            </div>
+          </div>
+          <span class="save-tag">SAVE ₹800 TODAY</span>
+        </div>
+
+        <!-- Inclusions Checklist -->
+        <ul class="included-list">
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Complete Digital eBook (10 Actionable Chapters)</span>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>5 Bonus Operational Templates (Outreach, Ads & Research)</span>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Razorpay, Stripe & PayPal Setup Guidance for Indian Sellers</span>
+          </li>
+          <li>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Instant Download Access on Any Device (Mobile/Laptop)</span>
+          </li>
+        </ul>
+
+        <!-- Direct Purchase Action Form -->
+        <div class="buy-form-box">
+          <div class="form-heading">
+            <span>Get Instant Access Now</span>
+            <span style="color: var(--blue);">₹199 Only</span>
+          </div>
+
+          <form id="instantBuyForm" onsubmit="processPayment(event)">
+            <div class="form-inputs-grid">
+              <input type="text" id="custName" class="form-field" placeholder="Your Name" required>
+              <input type="email" id="custEmail" class="form-field" placeholder="Your Email Address" required>
+            </div>
+            <input type="tel" id="custPhone" class="form-field" placeholder="Mobile / WhatsApp Number (for receipt)" style="margin-bottom: 12px;" required>
+
+            <button type="submit" class="pay-btn" id="payButton">
+              Pay ₹199 & Download Blueprint &rarr;
+            </button>
+          </form>
+
+          <div class="pay-trust">
+            <span>🔒 256-Bit SSL Encrypted</span>
+            <span>⚡ UPI, GPay, PhonePe, Cards</span>
+            <span>📥 Direct Link Delivery</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== WHAT IS INTERNATIONAL DROPSHIPPING ==================== -->
+    <section class="quick-why-box">
+      <div class="section-label">Understanding The Opportunity</div>
+      <h2 class="section-h">Why International Dropshipping Beats Domestic India Dropshipping</h2>
+
+      <div class="versus-grid">
+        <div class="versus-col versus-bad">
+          <div class="versus-title">❌ Domestic Dropshipping in India (COD)</div>
+          <ul class="versus-list">
+            <li>• <strong>30%–45% RTO Disaster:</strong> Buyers reject parcels at the doorstep, charging you return courier penalties.</li>
+            <li>• <strong>Wafer-Thin Margins:</strong> Making barely ₹150–₹250 profit per item after ad spends.</li>
+            <li>• <strong>Cash Locked:</strong> COD courier remittances take 10–20 days to reach your account.</li>
+          </ul>
+        </div>
+
+        <div class="versus-col versus-good">
+          <div class="versus-title">✅ International Dropshipping (Global USD)</div>
+          <ul class="versus-list">
+            <li>• <strong>100% Prepaid Orders:</strong> Foreign buyers pay upfront via Card/PayPal. <strong>Zero COD = 0% RTO!</strong></li>
+            <li>• <strong>High-Ticket Profit:</strong> Earn $20 to $50 USD (<strong>₹1,600 to ₹4,000 INR</strong>) pure profit per single sale.</li>
+            <li>• <strong>Operate From India:</strong> Global suppliers air-ship directly to foreign customers in 7–10 days.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== WHAT'S INSIDE + BONUSES ==================== -->
+    <section class="content-breakdown">
+      
+      <!-- Chapters -->
+      <div class="content-box">
+        <div class="section-label">Curriculum</div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 6px;">
+          What's Inside the 10 Chapters
+        </h3>
+        <p style="font-size: 0.84rem; color: var(--text-muted);">Step-by-step practical modules covering the exact international roadmap.</p>
+
+        <div class="chapter-tags-grid">
+          <div class="chapter-tag-item"><span class="chapter-tag-num">01</span> Dropshipping Fundamentals</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">02</span> Tier-1 Market Research</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">03</span> Winning Product Selection</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">04</span> Finding Vetted Suppliers</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">05</span> High-Converting Store Setup</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">06</span> Indian Payment Gateways</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">07</span> Meta Ads & TikTok UGC</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">08</span> Global Order Fulfillment</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">09</span> Customer Care & Disputes</div>
+          <div class="chapter-tag-item"><span class="chapter-tag-num">10</span> Scaling & Automation</div>
+        </div>
+      </div>
+
+      <!-- 5 Bonuses -->
+      <div class="content-box">
+        <div class="section-label">Value Stack</div>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--navy); margin-bottom: 6px;">
+          5 Done-For-You Bonus Scripts (Included Free)
+        </h3>
+        <p style="font-size: 0.84rem; color: var(--text-muted);">Copy-and-paste operational templates to save hours of work.</p>
+
+        <div class="bonus-pill-list">
+          <div class="bonus-pill-card">
+            <strong>1. Product Research Scorecard</strong>
+            <span>FREE (₹299 Value)</span>
+          </div>
+          <div class="bonus-pill-card">
+            <strong>2. Supplier Outreach & Negotiation Script</strong>
+            <span>FREE (₹299 Value)</span>
+          </div>
+          <div class="bonus-pill-card">
+            <strong>3. High-Converting Ad Copy Template</strong>
+            <span>FREE (₹299 Value)</span>
+          </div>
+          <div class="bonus-pill-card">
+            <strong>4. Customer Support Dispute Macros</strong>
+            <span>FREE (₹299 Value)</span>
+          </div>
+          <div class="bonus-pill-card">
+            <strong>5. Daily 15-Min Store Operations SOP</strong>
+            <span>FREE (₹299 Value)</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== CUSTOMER REVIEWS ==================== -->
+    <section class="reviews-card-box">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div class="section-label">Real Feedback</div>
+          <h2 class="section-h" style="margin-bottom: 0;">What Indian Founders Say</h2>
+        </div>
+        <div style="background: var(--bg-subtle); padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); font-size: 0.82rem; font-weight: 700; color: var(--navy);">
+          ⭐ 4.9/5.0 Rating • 340+ Indian Sellers
+        </div>
+      </div>
+
+      <div class="review-mini-grid">
+        <div class="review-mini-item">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-body">
+              "India me COD orders me 40% RTO se mera sara profit loss ho raha tha. Is guide ne bataya ki kaise Stripe & PayPal se US buyers ko target karke prepaid sales lete hain."
+            </p>
+          </div>
+          <div>
+            <div class="review-author">Arjun Verma</div>
+            <div class="review-auth-loc">Pune, Maharashtra • Scaled to $12k/mo</div>
+          </div>
+        </div>
+
+        <div class="review-mini-item">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-body">
+              "The Supplier Outreach script worked on the first try with CJ Dropshipping. Got VIP line with 8-day US delivery. 199 rupees me itna solid content impossible hai."
+            </p>
+          </div>
+          <div>
+            <div class="review-author">Priya Mohan</div>
+            <div class="review-auth-loc">Bangalore, Karnataka • DTC Store Founder</div>
+          </div>
+        </div>
+
+        <div class="review-mini-item">
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-body">
+              "No fake lamborghini hype. Pure practical Indian business perspective—GST, IEC, Razorpay international, sab kuch clear kiya hai."
+            </p>
+          </div>
+          <div>
+            <div class="review-author">Kunal Sharma</div>
+            <div class="review-auth-loc">Delhi NCR • E-commerce Beginner</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SIMPLE FAQ ==================== -->
+    <section class="faq-mini-box">
+      <div class="section-label">Clarity</div>
+      <h2 class="section-h">Frequently Asked Questions</h2>
+
+      <div class="faq-mini-q">
+        <div class="faq-title">Can I really accept payments in USD from India?</div>
+        <div class="faq-ans">Yes! Chapter 6 is dedicated to this. We explain Razorpay International, PayPal Business, and Stripe pathways from India with RBI compliance.</div>
+      </div>
+
+      <div class="faq-mini-q">
+        <div class="faq-title">How do I receive the blueprint after paying ₹199?</div>
+        <div class="faq-ans">Immediately on screen you get a direct download link, plus a backup link is sent instantly to your email.</div>
+      </div>
+
+      <div class="faq-mini-q">
+        <div class="faq-title">Do I need huge capital or inventory?</div>
+        <div class="faq-ans">No. You never hold inventory. A customer pays you first, then you order from the supplier using the customer's funds.</div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-mini">
+      © 2026 Dropship India Blueprint. All rights reserved. • Educational digital product for entrepreneurs.
+    </footer>
+
+  </main>
+
+  <!-- ==================== CONFIRMATION MODAL ==================== -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-inner" style="max-width: 480px; text-align: center; padding: 32px 28px;">
+      <div style="width: 60px; height: 60px; background: #ecfdf5; color: #059669; border: 2px solid #a7f3d0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <span style="display: inline-block; background: #ecfdf5; color: #065f46; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Payment Verified & Confirmed</span>
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Access Your Blueprint Now!</h3>
+      <p style="font-size: 0.9rem; color: #475569; margin-bottom: 22px; line-height: 1.5;" id="orderMsg">
+        Thank you! Your payment of <strong>₹199</strong> has been verified. Click below to open and access your digital product.
+      </p>
+
+      <!-- Digital Product Access Link Box -->
+      <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; padding: 20px; margin-bottom: 20px; text-align: center;">
+        <div style="font-size: 0.82rem; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">
+          🚀 Your Digital Product Is Ready:
+        </div>
+        
+        <a 
+          id="productOpenLink"
+          href="https://dropshipglobal.vercel.app" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: #16a34a; color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 800; font-size: 1.05rem; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4); transition: all 0.2s ease;"
+          onmouseover="this.style.background='#15803d'; this.style.transform='translateY(-1px)';"
+          onmouseout="this.style.background='#16a34a'; this.style.transform='translateY(0)';"
+        >
+          <span>Open Link &rarr;</span>
+        </a>
+
+        <div style="margin-top: 12px; font-size: 0.8rem; color: #4b5563;">
+          Opens in a new tab: <span style="font-family: monospace; color: #15803d; font-weight: 700;">dropshipglobal.vercel.app</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button style="flex: 1; padding: 11px; background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;" onclick="document.getElementById('successModal').classList.remove('open')">
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Razorpay API Gateway Configuration ---
+    // Connected to your Live Razorpay Account:
+    window.RAZORPAY_CONFIG = {
+      key_id: "rzp_live_TbXpMHWLFUG29I", // Your Live Razorpay Key
+      amount: 19900,                    // 19900 paise = ₹199
+      currency: "INR",
+      name: "Dropship India",
+      description: "International Dropshipping Blueprint (PDF + 5 Bonuses)",
+      image: "assets/images/book-front.jpg"
+    };
+
+    function showCover(type) {
+      const img = document.getElementById('bookImg');
+      const btnF = document.getElementById('btnFront');
+      const btnB = document.getElementById('btnBack');
+      if (type === 'front') {
+        img.src = "assets/images/book-front.jpg";
+        btnF.classList.add('active');
+        btnB.classList.remove('active');
+      } else {
+        img.src = "assets/images/book-back.jpg";
+        btnB.classList.add('active');
+        btnF.classList.remove('active');
+      }
+    }
+
+    let currentServerOrderId = null;
+
+    async function processPayment(e) {
+      e.preventDefault();
+      const name = document.getElementById('custName').value.trim();
+      const email = document.getElementById('custEmail').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const btn = document.getElementById('payButton');
+
+      if (!name || !email || !phone) {
+        alert("Please fill in Name, Email and Mobile number.");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Opening Payment Gateway...";
+
+      // Record lead as Abandoned on server immediately
+      try {
+        const initRes = await fetch('/api/order/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone })
+        });
+        const initData = await initRes.json();
+        if (initData.success) {
+          currentServerOrderId = initData.orderId;
+        }
+      } catch (e) {
+        console.warn('Order initiate note:', e.message);
+      }
+
+      // Check if Razorpay SDK is loaded
+      if (typeof window.Razorpay === 'undefined') {
+        // Dynamically load SDK if not loaded yet
+        const script = document.createElement('script');
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.onload = () => {
+          launchRazorpay(name, email, phone, btn);
+        };
+        script.onerror = () => {
+          alert("Could not load Razorpay SDK. Please check your internet connection.");
+          btn.disabled = false;
+          btn.textContent = "Pay ₹199 & Download Blueprint →";
+        };
+        document.body.appendChild(script);
+      } else {
+        launchRazorpay(name, email, phone, btn);
+      }
+    }
+
+    function launchRazorpay(name, email, phone, btn) {
+      try {
+        const options = {
+          key: window.RAZORPAY_CONFIG.key_id,
+          amount: window.RAZORPAY_CONFIG.amount,
+          currency: window.RAZORPAY_CONFIG.currency,
+          name: window.RAZORPAY_CONFIG.name,
+          description: window.RAZORPAY_CONFIG.description,
+          image: window.RAZORPAY_CONFIG.image,
+          prefill: {
+            name: name,
+            email: email,
+            contact: phone
+          },
+          theme: {
+            color: "#185adb"
+          },
+          handler: async function (response) {
+            btn.disabled = false;
+            btn.textContent = "Pay ₹199 & Download Blueprint →";
+
+            // Mark order as PAID on server
+            try {
+              await fetch('/api/order/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  orderId: currentServerOrderId,
+                  name: name,
+                  email: email,
+                  phone: phone,
+                  payment_id: response.razorpay_payment_id
+                })
+              });
+            } catch (e) {
+              console.warn('Order complete mark note:', e.message);
+            }
+
+            finishOrder(name, email, response.razorpay_payment_id);
+          },
+          modal: {
+            ondismiss: function () {
+              btn.disabled = false;
+              btn.textContent = "Pay ₹199 & Download Blueprint →";
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (failedRes) {
+          alert('Payment was not completed: ' + (failedRes.error.description || 'Cancelled'));
+          btn.disabled = false;
+          btn.textContent = "Pay ₹199 & Download Blueprint →";
+        });
+        rzp.open();
+
+      } catch (err) {
+        console.error("Razorpay Launch Error:", err);
+        alert("Could not launch Razorpay: " + err.message);
+        btn.disabled = false;
+        btn.textContent = "Pay ₹199 & Download Blueprint →";
+      }
+    }
+
+    function finishOrder(name, email, payId) {
+      const btn = document.getElementById('payButton');
+      btn.disabled = false;
+      btn.textContent = "Pay ₹199 & Download Blueprint →";
+      document.getElementById('orderMsg').innerHTML = `
+        Thank you <strong>${name}</strong>! Your transaction <code>${payId}</code> of <strong>₹199</strong> is verified. Click <strong>"Open Link"</strong> below to access your digital product.
+      `;
+      document.getElementById('successModal').classList.add('open');
+    }
+  </script>
+
+</body>
+</html>

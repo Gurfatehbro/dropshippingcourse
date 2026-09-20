@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropship India Admin | Orders & Abandoned Follow-Ups</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+      --brand-blue: #3b82f6;
+      --brand-blue-hover: #2563eb;
+      --success: #10b981;
+      --success-soft: rgba(16, 185, 129, 0.15);
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.15);
+      --warning: #f59e0b;
+      --font: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding: 30px 20px;
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-badge {
+      background: var(--brand-blue);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .admin-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      padding: 9px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary { background: var(--brand-blue); color: #fff; }
+    .btn-primary:hover { background: var(--brand-blue-hover); }
+    .btn-secondary { background: var(--surface); color: var(--text-main); border: 1px solid var(--surface-border); }
+    .btn-secondary:hover { background: #334155; }
+
+    /* KPI Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-sub {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+    .val-paid { color: var(--success); }
+    .val-rev { color: #60a5fa; }
+    .val-abandoned { color: var(--danger); }
+
+    /* Follow Up Scripts Accordion / Banner */
+    .scripts-banner {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 28px;
+    }
+    .scripts-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .scripts-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .scripts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .script-item {
+      background: #0f172a;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .script-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #60a5fa;
+      margin-bottom: 6px;
+    }
+    .script-body {
+      font-family: var(--font);
+      font-size: 0.83rem;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+      white-space: pre-line;
+      line-height: 1.5;
+    }
+    .copy-btn {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .copy-btn:hover { color: #fff; background: #334155; }
+
+    /* Orders Table Area */
+    .orders-area {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .tab-pills {
+      display: flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--surface-border);
+    }
+    .tab-item {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .tab-item.active {
+      background: var(--brand-blue);
+      color: #fff;
+    }
+    .search-input {
+      background: #0f172a;
+      border: 1px solid var(--surface-border);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      width: 260px;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brand-blue);
+    }
+
+    /* Table */
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .orders-table th {
+      background: #172033;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 14px 22px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    .orders-table td {
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      vertical-align: middle;
+    }
+    .orders-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .status-paid {
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-abandoned {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .wa-btn {
+      background: #128c7e;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .wa-btn:hover {
+      background: #075e54;
+    }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .scripts-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .table-toolbar { flex-direction: column; align-items: stretch; }
+      .search-input { width: 100%; }
+    }
+
+    /* Passcode Gate Overlay */
+    #lockOverlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #1e293b 0%, #070b14 100%);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .lock-card {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.2);
+      border-radius: 18px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      position: relative;
+    }
+    .lock-icon-wrap {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 16px;
+    }
+    .lock-badge {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .lock-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .lock-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.4;
+    }
+    .passcode-input {
+      width: 100%;
+      background: #0f172a;
+      border: 1.5px solid var(--surface-border);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 1rem;
+      text-align: center;
+      letter-spacing: 0.08em;
+      transition: all 0.2s ease;
+      margin-bottom: 14px;
+    }
+    .passcode-input:focus {
+      outline: none;
+      border-color: var(--brand-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    }
+    .passcode-submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--brand-blue);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .passcode-submit-btn:hover {
+      background: var(--brand-blue-hover);
+      transform: translateY(-1px);
+    }
+    .passcode-error {
+      color: #ef4444;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .shake-anim {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Passcode Gate Overlay -->
+  <div id="lockOverlay">
+    <div class="lock-card">
+      <div class="lock-icon-wrap">🔒</div>
+      <span class="lock-badge">Admin Security</span>
+      <h2 class="lock-title">Enter Admin Passcode</h2>
+      <p class="lock-subtitle">Access to Dropship India orders, revenue, and abandoned checkout follow-ups is restricted.</p>
+      
+      <form onsubmit="event.preventDefault(); unlockAdmin();">
+        <input 
+          type="password" 
+          id="passcodeInput" 
+          class="passcode-input" 
+          placeholder="Enter Passcode..." 
+          autocomplete="off"
+          required
+        >
+        <button type="submit" class="passcode-submit-btn">
+          Unlock Dashboard &rarr;
+        </button>
+      </form>
+      <div id="passcodeError" class="passcode-error"></div>
+    </div>
+  </div>
+
+  <div class="admin-container" id="adminContent" style="display: none;">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-brand">
+        <div class="admin-title">🌐 Dropship India</div>
+        <span class="admin-badge">Admin Panel</span>
+        <span style="font-size: 0.75rem; color: #10b981; margin-left: 8px;">● Live Tracking Active</span>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="loadOrders()">🔄 Refresh</button>
+        <button class="btn btn-secondary" onclick="exportCsv()">📥 Export CSV</button>
+        <a href="/" target="_blank" class="btn btn-primary">Visit Store &rarr;</a>
+        <button class="btn btn-secondary" onclick="logoutAdmin()" title="Lock Dashboard" style="border-color: #ef4444; color: #ef4444;">🔒 Lock</button>
+      </div>
+    </header>
+
+    <!-- Key Stats Metrics -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value val-rev" id="statRevenue">₹0</div>
+        <div class="stat-sub">From Completed ₹199 Orders</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Paid Orders</div>
+        <div class="stat-value val-paid" id="statPaid">0</div>
+        <div class="stat-sub">Razorpay Verified Customers</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Abandoned Checkouts</div>
+        <div class="stat-value val-abandoned" id="statAbandoned">0</div>
+        <div class="stat-sub">Hot Leads (Follow-Up Needed)</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Conversion Rate</div>
+        <div class="stat-value" id="statConversion">0%</div>
+        <div class="stat-sub">Checkout Completion Ratio</div>
+      </div>
+    </section>
+
+    <!-- Follow Up Message Templates -->
+    <section class="scripts-banner">
+      <div class="scripts-header">
+        <div class="scripts-title">
+          <span>💬 Ready-to-Send WhatsApp Follow-Up Templates</span>
+        </div>
+        <span style="font-size: 0.8rem; color: var(--text-light);">Click 'Copy' or use the green WhatsApp button on any abandoned order below</span>
+      </div>
+
+      <div class="scripts-grid">
+        <div class="script-item">
+          <div>
+            <div class="script-name">Template 1: Friendly Payment Check (Recommended)</div>
+            <div class="script-body" id="script1">Hey [NAME]! 👋 Saw that you were checking out the "International Dropshipping Blueprint", but your payment of ₹199 got interrupted.
+
+Is everything okay with your UPI / Card? Here is the direct link to complete it and get the 5 bonus scripts:
+👉 http://localhost:3000
+
+Let me know if you need any help!</div>
+          </div>
+          <button class="copy-btn" onclick="copyText('script1')">Copy Message</button>
+        </div>
+
+        <div class="script-item">
+          <div>
+            <div class="script-name">Template 2: Hindi / Direct Solution</div>
+            <div class="script-body" id="script2">Hi [NAME], Gurfateh here from Dropship India!
+
+Maine dekha aap international dropshipping blueprint check kar rahe the but order complete nahi hua.
+
+Agar payment me koi issue aa raha tha (UPI ya Card), to batayein I can help you out.
+Link: http://localhost:3000</div>
+          </div>
+          <button class="copy-btn" onclick="copyText('script2')">Copy Message</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Orders Table Area -->
+    <section class="orders-area">
+      <div class="table-toolbar">
+        <div class="tab-pills">
+          <button class="tab-item active" id="tabAll" onclick="setFilter('ALL')">All (<span id="countAll">0</span>)</button>
+          <button class="tab-item" id="tabPaid" onclick="setFilter('PAID')">Paid (<span id="countPaid">0</span>)</button>
+          <button class="tab-item" id="tabAbandoned" onclick="setFilter('ABANDONED')">Abandoned (<span id="countAbandoned">0</span>)</button>
+        </div>
+
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, email, phone..." oninput="renderTable()">
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Contact Details</th>
+              <th>Date & Time</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Payment ID / Action</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTbody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                Loading orders...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const REQUIRED_PASSCODE = 'dropshippingadmin';
+    let allOrders = [];
+    let currentFilter = 'ALL';
+
+    function getSavedPasscode() {
+      return sessionStorage.getItem('admin_passcode') || '';
+    }
+
+    function checkAuth() {
+      const saved = getSavedPasscode();
+      const overlay = document.getElementById('lockOverlay');
+      const content = document.getElementById('adminContent');
+
+      if (saved === REQUIRED_PASSCODE) {
+        overlay.style.display = 'none';
+        content.style.display = 'block';
+        loadOrders();
+        return true;
+      } else {
+        overlay.style.display = 'flex';
+        content.style.display = 'none';
+        const input = document.getElementById('passcodeInput');
+        if (input) {
+          input.value = '';
+          setTimeout(() => input.focus(), 150);
+        }
+        return false;
+      }
+    }
+
+    function unlockAdmin() {
+      const input = document.getElementById('passcodeInput');
+      const errEl = document.getElementById('passcodeError');
+      const card = document.querySelector('.lock-card');
+      const entered = (input.value || '').trim();
+
+      if (entered === REQUIRED_PASSCODE) {
+        sessionStorage.setItem('admin_passcode', entered);
+        errEl.textContent = '';
+        checkAuth();
+      } else {
+        errEl.textContent = '❌ Incorrect passcode. Please try again.';
+        if (card) {
+          card.classList.remove('shake-anim');
+          void card.offsetWidth; // force DOM reflow
+          card.classList.add('shake-anim');
+        }
+        input.focus();
+        input.select();
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('admin_passcode');
+      checkAuth();
+    }
+
+    async function loadOrders() {
+      const passcode = getSavedPasscode();
+      if (passcode !== REQUIRED_PASSCODE) return;
+
+      try {
+        const res = await fetch('/api/admin/orders', {
+          headers: {
+            'X-Admin-Passcode': passcode
+          }
+        });
+
+        if (res.status === 401) {
+          logoutAdmin();
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          allOrders = data.orders;
+          updateStats(data.stats);
+          renderTable();
+        }
+      } catch (err) {
+        console.error('Failed to load orders:', err);
+      }
+    }
+
+    function updateStats(stats) {
+      document.getElementById('statRevenue').textContent = `₹${(stats.totalRevenue || 0).toLocaleString('en-IN')}`;
+      document.getElementById('statPaid').textContent = stats.paidCount || 0;
+      document.getElementById('statAbandoned').textContent = stats.abandonedCount || 0;
+      document.getElementById('statConversion').textContent = `${stats.conversionRate || 0}%`;
+
+      document.getElementById('countAll').textContent = stats.totalOrders || 0;
+      document.getElementById('countPaid').textContent = stats.paidCount || 0;
+      document.getElementById('countAbandoned').textContent = stats.abandonedCount || 0;
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.getElementById('tabAll').classList.toggle('active', filter === 'ALL');
+      document.getElementById('tabPaid').classList.toggle('active', filter === 'PAID');
+      document.getElementById('tabAbandoned').classList.toggle('active', filter === 'ABANDONED');
+      renderTable();
+    }
+
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const tbody = document.getElementById('ordersTbody');
+
+      let filtered = allOrders.filter(o => {
+        if (currentFilter !== 'ALL' && o.status !== currentFilter) return false;
+        if (search) {
+          const hay = `${o.name} ${o.email} ${o.phone}`.toLowerCase();
+          return hay.includes(search);
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No orders found matching this filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => {
+        const isPaid = o.status === 'PAID';
+        const dateStr = new Date(o.date).toLocaleString('en-IN', {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        // Clean phone for WhatsApp link
+        let cleanPhone = (o.phone || '').replace(/\D/g, '');
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+        const waText = encodeURIComponent(
+          `Hey ${o.name || 'there'}! 👋 Saw you were checking out the International Dropshipping Blueprint (₹199). Did your payment get interrupted? Here is the direct link: http://localhost:3000`
+        );
+        const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #fff;">${escapeHtml(o.name || 'Anonymous')}</div>
+              <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">${o.id}</div>
+            </td>
+            <td>
+              <div style="color: #cbd5e1;">${escapeHtml(o.phone || 'No phone')}</div>
+              <div style="font-size: 0.75rem; color: #94a3b8;">${escapeHtml(o.email || 'No email')}</div>
+            </td>
+            <td style="color: #94a3b8; font-size: 0.8rem;">
+              ${dateStr}
+            </td>
+            <td style="font-weight: 800; color: #fff;">
+              ₹${o.amount || 199}
+            </td>
+            <td>
+              <span class="status-badge ${isPaid ? 'status-paid' : 'status-abandoned'}">
+                ${isPaid ? '● PAID' : '⚠ ABANDONED'}
+              </span>
+            </td>
+            <td>
+              ${isPaid 
+                ? `<span style="font-family: monospace; font-size: 0.78rem; color: #10b981;">${escapeHtml(o.payment_id || 'Verified')}</span>`
+                : cleanPhone 
+                  ? `<a href="${waLink}" target="_blank" class="wa-btn">📲 WhatsApp Follow-Up</a>`
+                  : `<span style="color: #64748b; font-size: 0.75rem;">No phone provided</span>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function copyText(elemId) {
+      const text = document.getElementById(elemId).textContent;
+      navigator.clipboard.writeText(text);
+      alert('Message copied to clipboard!');
+    }
+
+    function exportCsv() {
+      if (!allOrders.length) { alert('No orders to export.'); return; }
+      const headers = ['Order ID', 'Name', 'Phone', 'Email', 'Amount', 'Status', 'Payment ID', 'Date'];
+      const rows = allOrders.map(o => [
+        o.id,
+        `"${(o.name||'').replace(/"/g, '""')}"`,
+        `"${o.phone||''}"`,
+        `"${o.email||''}"`,
+        o.amount || 199,
+        o.status,
+        `"${o.payment_id||''}"`,
+        `"${o.date}"`
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `dropship_india_orders_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+      );
+    }
+
+    // Check authentication on open & refresh orders every 10 seconds if authenticated
+    checkAuth();
+    setInterval(loadOrders, 10000);
+  </script>
+
+</body>
+</html>
