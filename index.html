@@ -889,11 +889,14 @@
       }
 
       // Record lead as Abandoned on server immediately & trigger Server CAPI
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTestCode = urlParams.get('test_event_code') || '';
+
       try {
         const initRes = await fetch('/api/order/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, phone, eventId: checkoutEventId })
+          body: JSON.stringify({ name, email, phone, eventId: checkoutEventId, test_code: urlTestCode })
         });
         const initData = await initRes.json();
         if (initData.success) {
@@ -909,7 +912,7 @@
         const script = document.createElement('script');
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.onload = () => {
-          launchRazorpay(name, email, phone, btn);
+          launchRazorpay(name, email, phone, btn, urlTestCode);
         };
         script.onerror = () => {
           alert("Could not load Razorpay SDK. Please check your internet connection.");
@@ -918,11 +921,11 @@
         };
         document.body.appendChild(script);
       } else {
-        launchRazorpay(name, email, phone, btn);
+        launchRazorpay(name, email, phone, btn, urlTestCode);
       }
     }
 
-    function launchRazorpay(name, email, phone, btn) {
+    function launchRazorpay(name, email, phone, btn, testCode = '') {
       try {
         const options = {
           key: window.RAZORPAY_CONFIG.key_id,
@@ -971,7 +974,8 @@
                   email: email,
                   phone: phone,
                   payment_id: response.razorpay_payment_id,
-                  eventId: purchaseEventId
+                  eventId: purchaseEventId,
+                  test_code: testCode
                 })
               });
             } catch (e) {

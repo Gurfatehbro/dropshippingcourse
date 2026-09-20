@@ -38,7 +38,7 @@ function hashSha256(str) {
   return crypto.createHash('sha256').update(String(str).trim().toLowerCase()).digest('hex');
 }
 
-function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, currency }, req) {
+function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, currency, test_code }, req) {
   return new Promise((resolve) => {
     const config = readCapiConfig();
     const pixelId = config.pixel_id || '4879107795666392';
@@ -97,8 +97,9 @@ function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, cur
         data: [eventItem]
       };
 
-      if (config.test_code) {
-        payload.test_event_code = config.test_code;
+      const testCode = test_code || config.test_code;
+      if (testCode) {
+        payload.test_event_code = testCode;
       }
 
       const payloadString = JSON.stringify(payload);
@@ -227,7 +228,8 @@ const server = http.createServer(async (req, res) => {
       name: newOrder.name,
       email: newOrder.email,
       phone: newOrder.phone,
-      amount: 199.00
+      amount: 199.00,
+      test_code: data.test_code
     }, req).catch(err => console.warn('CAPI InitiateCheckout note:', err.message));
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -275,7 +277,8 @@ const server = http.createServer(async (req, res) => {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      amount: 199.00
+      amount: 199.00,
+      test_code: data.test_code
     }, req).catch(err => console.warn('CAPI Purchase note:', err.message));
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
