@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>How to Start International Dropshipping From India | Blueprint (₹199)</title>
-  <meta name="description" content="Step-by-step practical blueprint for Indian entrepreneurs to build an international dropshipping business. Get the eBook + 5 bonus scripts for just ₹199.">
+  <title>How to Start International Dropshipping From India | Blueprint (₹1)</title>
+  <meta name="description" content="Step-by-step practical blueprint for Indian entrepreneurs to build an international dropshipping business. Get the eBook + 5 bonus scripts for just ₹1.">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -493,7 +493,7 @@
 
   <!-- Top Deal Ribbon -->
   <div class="top-banner">
-    🔥 <strong>SPECIAL LAUNCH OFFER:</strong> Complete Blueprint + 5 Bonus Templates for only <del>₹999</del> <strong>₹199</strong> (Save 80%)
+    🔥 <strong>SPECIAL LAUNCH OFFER:</strong> Complete Blueprint + 5 Bonus Templates for only <del>₹999</del> <strong>₹1</strong> (Save 99%)
   </div>
 
   <!-- Header -->
@@ -503,7 +503,7 @@
       <span class="brand-tag">Blueprint Edition</span>
     </div>
     <div style="font-size: 0.85rem; font-weight: 700; color: var(--navy);">
-      Launch Deal: <del style="color:#94a3b8;">₹999</del> <span style="color:var(--blue); font-size:1.05rem;">₹199</span>
+      Launch Deal: <del style="color:#94a3b8;">₹999</del> <span style="color:var(--blue); font-size:1.05rem;">₹1</span>
     </div>
   </nav>
 
@@ -528,7 +528,7 @@
 
       <!-- Info & Direct Buy Column -->
       <div class="product-info-col">
-        <div class="deal-badge">⚡ 80% OFF • LIMITED TIME DEAL</div>
+        <div class="deal-badge">⚡ 99% OFF • LIMITED TIME DEAL</div>
         
         <h1 class="product-title">How to Start International Dropshipping From India</h1>
         <p class="product-subtitle">
@@ -541,10 +541,10 @@
             <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase;">One-Time Payment</div>
             <div class="price-left">
               <span class="price-cut">₹999</span>
-              <span class="price-current">₹199</span>
+              <span class="price-current">₹1</span>
             </div>
           </div>
-          <span class="save-tag">SAVE ₹800 TODAY</span>
+          <span class="save-tag">SAVE ₹998 TODAY</span>
         </div>
 
         <!-- Inclusions Checklist -->
@@ -571,7 +571,7 @@
         <div class="buy-form-box">
           <div class="form-heading">
             <span>Get Instant Access Now</span>
-            <span style="color: var(--blue);">₹199 Only</span>
+            <span style="color: var(--blue);">₹1 Only</span>
           </div>
 
           <form id="instantBuyForm" onsubmit="processPayment(event)">
@@ -582,7 +582,7 @@
             <input type="tel" id="custPhone" class="form-field" placeholder="Mobile / WhatsApp Number (for receipt)" style="margin-bottom: 12px;" required>
 
             <button type="submit" class="pay-btn" id="payButton">
-              Pay ₹199 & Download Blueprint &rarr;
+              Pay ₹1 & Download Blueprint &rarr;
             </button>
           </form>
 
@@ -773,7 +773,7 @@
       <span style="display: inline-block; background: #ecfdf5; color: #065f46; font-size: 0.75rem; font-weight: 800; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Payment Verified & Confirmed</span>
       <h3 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 8px;">Access Your Blueprint Now!</h3>
       <p style="font-size: 0.9rem; color: #475569; margin-bottom: 22px; line-height: 1.5;" id="orderMsg">
-        Thank you! Your payment of <strong>₹199</strong> has been verified. Click below to open and access your digital product.
+        Thank you! Your payment of <strong>₹1</strong> has been verified. Click below to open and access your digital product.
       </p>
 
       <!-- Digital Product Access Link Box -->
@@ -812,7 +812,7 @@
     // Connected to your Live Razorpay Account:
     window.RAZORPAY_CONFIG = {
       key_id: "rzp_live_TbXpMHWLFUG29I", // Your Live Razorpay Key
-      amount: 19900,                    // 19900 paise = ₹199
+      amount: 100,                      // 100 paise = ₹1 (Testing Mode)
       currency: "INR",
       name: "Dropship India",
       description: "International Dropshipping Blueprint (PDF + 5 Bonuses)",
@@ -877,7 +877,7 @@
         script.onerror = () => {
           alert("Could not load Razorpay SDK. Please check your internet connection.");
           btn.disabled = false;
-          btn.textContent = "Pay ₹199 & Download Blueprint →";
+          btn.textContent = "Pay ₹1 & Download Blueprint →";
         };
         document.body.appendChild(script);
       } else {
@@ -904,7 +904,7 @@
           },
           handler: async function (response) {
             btn.disabled = false;
-            btn.textContent = "Pay ₹199 & Download Blueprint →";
+            btn.textContent = "Pay ₹1 & Download Blueprint →";
 
             // Mark order as PAID on server
             try {
@@ -928,7 +928,7 @@
           modal: {
             ondismiss: function () {
               btn.disabled = false;
-              btn.textContent = "Pay ₹199 & Download Blueprint →";
+              btn.textContent = "Pay ₹1 & Download Blueprint →";
             }
           }
         };
@@ -937,7 +937,7 @@
         rzp.on('payment.failed', function (failedRes) {
           alert('Payment was not completed: ' + (failedRes.error.description || 'Cancelled'));
           btn.disabled = false;
-          btn.textContent = "Pay ₹199 & Download Blueprint →";
+          btn.textContent = "Pay ₹1 & Download Blueprint →";
         });
         rzp.open();
 
@@ -945,16 +945,16 @@
         console.error("Razorpay Launch Error:", err);
         alert("Could not launch Razorpay: " + err.message);
         btn.disabled = false;
-        btn.textContent = "Pay ₹199 & Download Blueprint →";
+        btn.textContent = "Pay ₹1 & Download Blueprint →";
       }
     }
 
     function finishOrder(name, email, payId) {
       const btn = document.getElementById('payButton');
       btn.disabled = false;
-      btn.textContent = "Pay ₹199 & Download Blueprint →";
+      btn.textContent = "Pay ₹1 & Download Blueprint →";
       document.getElementById('orderMsg').innerHTML = `
-        Thank you <strong>${name}</strong>! Your transaction <code>${payId}</code> of <strong>₹199</strong> is verified. Click <strong>"Open Link"</strong> below to access your digital product.
+        Thank you <strong>${name}</strong>! Your transaction <code>${payId}</code> of <strong>₹1</strong> is verified. Click <strong>"Open Link"</strong> below to access your digital product.
       `;
       document.getElementById('successModal').classList.add('open');
     }

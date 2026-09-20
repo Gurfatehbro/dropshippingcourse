@@ -483,7 +483,7 @@
       <div class="stat-card">
         <div class="stat-label">Total Revenue</div>
         <div class="stat-value val-rev" id="statRevenue">₹0</div>
-        <div class="stat-sub">From Completed ₹199 Orders</div>
+        <div class="stat-sub">From Verified Paid Orders</div>
       </div>
 
       <div class="stat-card">
@@ -719,7 +719,7 @@ Link: http://localhost:3000</div>
         if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
 
         const waText = encodeURIComponent(
-          `Hey ${o.name || 'there'}! 👋 Saw you were checking out the International Dropshipping Blueprint (₹199). Did your payment get interrupted? Here is the direct link: http://localhost:3000`
+          `Hey ${o.name || 'there'}! 👋 Saw you were checking out the International Dropshipping Blueprint (₹${o.amount || 1}). Did your payment get interrupted? Here is the direct link: http://localhost:3000`
         );
         const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
 
@@ -737,7 +737,7 @@ Link: http://localhost:3000</div>
               ${dateStr}
             </td>
             <td style="font-weight: 800; color: #fff;">
-              ₹${o.amount || 199}
+              ₹${o.amount || 1}
             </td>
             <td>
               <span class="status-badge ${isPaid ? 'status-paid' : 'status-abandoned'}">
@@ -771,7 +771,7 @@ Link: http://localhost:3000</div>
         `"${(o.name||'').replace(/"/g, '""')}"`,
         `"${o.phone||''}"`,
         `"${o.email||''}"`,
-        o.amount || 199,
+        o.amount || 1,
         o.status,
         `"${o.payment_id||''}"`,
         `"${o.date}"`

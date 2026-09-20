@@ -76,7 +76,7 @@ const server = http.createServer(async (req, res) => {
       name: (data.name || '').trim() || 'Guest',
       email: (data.email || '').trim(),
       phone: (data.phone || '').trim(),
-      amount: 199,
+      amount: data.amount || 1,
       status: 'ABANDONED', // Starts as Abandoned until payment completes
       payment_id: null,
       date: new Date().toISOString()
@@ -102,6 +102,7 @@ const server = http.createServer(async (req, res) => {
         ord.status = 'PAID';
         ord.payment_id = data.payment_id || `pay_${Date.now()}`;
         ord.paid_at = new Date().toISOString();
+        if (data.amount) ord.amount = data.amount;
         updated = true;
         break;
       }
@@ -115,7 +116,7 @@ const server = http.createServer(async (req, res) => {
         name: data.name || 'Customer',
         email: data.email || '',
         phone: data.phone || '',
-        amount: 199,
+        amount: data.amount || 1,
         status: 'PAID',
         payment_id: data.payment_id || `pay_${Date.now()}`,
         date: new Date().toISOString(),
@@ -144,7 +145,7 @@ const server = http.createServer(async (req, res) => {
     const orders = readOrders();
     const paidOrders = orders.filter(o => o.status === 'PAID');
     const abandonedOrders = orders.filter(o => o.status === 'ABANDONED');
-    const totalRevenue = paidOrders.length * 199;
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + (Number(o.amount) || 0), 0);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
