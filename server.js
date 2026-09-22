@@ -9,6 +9,12 @@ const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_N
 const ORDERS_FILE = isVercel ? path.join('/tmp', 'orders.json') : path.join(__dirname, 'orders.json');
 const CAPI_CONFIG_FILE = isVercel ? path.join('/tmp', 'capi_config.json') : path.join(__dirname, 'capi_config.json');
 
+const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'dropshippingadmin';
+
+// Upstash / Vercel KV optional environment variables
+const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
+
 function readCapiConfig() {
   try {
     if (!fs.existsSync(CAPI_CONFIG_FILE)) {
@@ -51,6 +57,17 @@ function saveCapiConfig(cfg) {
 function hashSha256(str) {
   if (!str) return null;
   return crypto.createHash('sha256').update(String(str).trim().toLowerCase()).digest('hex');
+}
+
+function getEventSourceUrl(req) {
+  if (req && req.headers) {
+    if (req.headers.referer) return req.headers.referer;
+    if (req.headers.origin) return req.headers.origin;
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    if (host) return `${proto}://${host}`;
+  }
+  return 'https://intdropshippingcourse.vercel.app';
 }
 
 function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, currency, test_code }, req) {
@@ -97,12 +114,12 @@ function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, cur
         event_name: eventName,
         event_time: Math.floor(Date.now() / 1000),
         event_id: eventId || `ev_${Date.now()}`,
-        event_source_url: (req && req.headers && (req.headers.referer || req.headers.origin)) || 'https://intdropshippingcourse.vercel.app',
+        event_source_url: getEventSourceUrl(req),
         action_source: 'website',
         user_data: userData,
         custom_data: {
           currency: currency || 'INR',
-          value: Number(amount) || 199.00,
+          value: Number(amount) || 1.00,
           content_name: 'International Dropshipping Blueprint (PDF + 5 Bonuses)',
           content_type: 'product'
         }
@@ -124,7 +141,7 @@ function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, cur
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(payloadString)
         },
-        timeout: 5000
+        timeout: 6000
       }, (postRes) => {
         let resBody = '';
         postRes.on('data', chunk => (resBody += chunk));
@@ -166,7 +183,8 @@ const MIME_TYPES = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon'
 };
 
 function readOrders() {
@@ -195,8 +213,32 @@ function saveOrders(orders) {
   try {
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
   } catch (e) {
-    console.error('Error saving orders:', e.message);
+    console.error('Error saving orders locally:', e.message);
   }
+
+  // If Upstash/Vercel KV REST is configured, sync asynchronously
+  if (KV_URL && KV_TOKEN) {
+    syncOrdersToKv(orders).catch(err => console.warn('KV sync error:', err.message));
+  }
+}
+
+async function syncOrdersToKv(orders) {
+  try {
+    const url = `${KV_URL.replace(/\/$/, '')}/set/dropship_orders`;
+    const payload = JSON.stringify({ value: JSON.stringify(orders) });
+    const postReq = https.request(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${KV_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      },
+      timeout: 3000
+    });
+    postReq.on('error', () => {});
+    postReq.write(payload);
+    postReq.end();
+  } catch (e) {}
 }
 
 function parseBody(req) {
@@ -223,10 +265,40 @@ function parseBody(req) {
   });
 }
 
+function getSanitizedPath(req) {
+  if (req.endpoint) return req.endpoint;
+
+  // Determine path from all possible environments (Vercel, AWS Lambda, Node server)
+  const candidate = req.url || 
+                    req.headers['x-invoke-path'] || 
+                    req.headers['x-matched-path'] || 
+                    '/';
+
+  let clean = String(candidate).split('?')[0].trim();
+  clean = clean.replace(/\/+/g, '/');
+
+  if (clean.length > 1 && clean.endsWith('/')) {
+    clean = clean.slice(0, -1);
+  }
+
+  if (clean.endsWith('.js')) {
+    clean = clean.slice(0, -3);
+  }
+
+  return clean;
+}
+
+function isAuthorized(req) {
+  const authHeader = req.headers['x-admin-passcode'] || '';
+  const searchParams = new URL(req.url, 'http://localhost').searchParams;
+  const queryPass = searchParams.get('passcode') || '';
+  return (authHeader === ADMIN_PASSCODE || queryPass === ADMIN_PASSCODE);
+}
+
 async function handleRequest(req, res) {
-  // CORS Headers
+  // CORS Headers for multi-domain support
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Passcode, Authorization');
 
   if (req.method === 'OPTIONS') {
@@ -235,11 +307,24 @@ async function handleRequest(req, res) {
     return;
   }
 
-  const rawUrl = req.headers['x-matched-path'] || req.url || '/';
-  const urlParts = rawUrl.split('?');
-  const reqPath = urlParts[0];
+  const reqPath = getSanitizedPath(req);
 
-  // API 1: Initiate Order / Record Abandoned Lead & Trigger CAPI
+  // Health Check & Diagnostic API
+  if (reqPath === '/api/admin/health' || reqPath.endsWith('/admin/health')) {
+    const orders = readOrders();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      status: 'healthy',
+      environment: isVercel ? 'Vercel Serverless' : 'Local Node.js',
+      detectedHost: req.headers.host || 'unknown',
+      orderCount: orders.length,
+      timestamp: new Date().toISOString()
+    }));
+    return;
+  }
+
+  // API 1: Initiate Order / Record Abandoned Lead & Trigger CAPI InitiateCheckout
   if ((reqPath === '/api/order/initiate' || reqPath.endsWith('/order/initiate')) && req.method === 'POST') {
     const data = await parseBody(req);
     const orders = readOrders();
@@ -250,8 +335,9 @@ async function handleRequest(req, res) {
       name: (data.name || '').trim() || 'Guest',
       email: (data.email || '').trim(),
       phone: (data.phone || '').trim(),
-      amount: 199,
+      amount: data.amount ? Number(data.amount) : 1,
       status: 'ABANDONED', // Starts as Abandoned until payment completes
+      contacted: false,
       payment_id: null,
       date: new Date().toISOString()
     };
@@ -264,7 +350,7 @@ async function handleRequest(req, res) {
       name: newOrder.name,
       email: newOrder.email,
       phone: newOrder.phone,
-      amount: 199.00,
+      amount: newOrder.amount || 1.00,
       test_code: data.test_code
     }, req).catch(err => console.warn('CAPI InitiateCheckout note:', err.message));
 
@@ -278,28 +364,28 @@ async function handleRequest(req, res) {
     const data = await parseBody(req);
     const orders = readOrders();
 
-    // Match by orderId or email/phone
     let updated = false;
     for (let ord of orders) {
-      if ((data.orderId && ord.id === data.orderId) || (data.email && ord.email.toLowerCase() === data.email.toLowerCase())) {
+      if ((data.orderId && ord.id === data.orderId) || (data.email && ord.email && ord.email.toLowerCase() === data.email.toLowerCase())) {
         ord.status = 'PAID';
         ord.payment_id = data.payment_id || `pay_${Date.now()}`;
         ord.paid_at = new Date().toISOString();
+        if (data.amount) ord.amount = Number(data.amount);
         updated = true;
         break;
       }
     }
 
     if (!updated) {
-      // Create new paid entry if not found
       orders.unshift({
         id: `ord_${Date.now()}`,
         order_id: `lead_${Date.now()}`,
         name: data.name || 'Customer',
         email: data.email || '',
         phone: data.phone || '',
-        amount: 199,
+        amount: data.amount ? Number(data.amount) : 1,
         status: 'PAID',
+        contacted: false,
         payment_id: data.payment_id || `pay_${Date.now()}`,
         date: new Date().toISOString(),
         paid_at: new Date().toISOString()
@@ -313,7 +399,7 @@ async function handleRequest(req, res) {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      amount: 199.00,
+      amount: data.amount ? Number(data.amount) : 1.00,
       test_code: data.test_code
     }, req).catch(err => console.warn('CAPI Purchase note:', err.message));
 
@@ -324,11 +410,7 @@ async function handleRequest(req, res) {
 
   // API 3: Get All Orders for Admin Dashboard
   if ((reqPath === '/api/admin/orders' || reqPath.endsWith('/admin/orders')) && req.method === 'GET') {
-    const authHeader = req.headers['x-admin-passcode'] || '';
-    const searchParams = new URL(req.url, 'http://localhost').searchParams;
-    const queryPass = searchParams.get('passcode') || '';
-
-    if (authHeader !== 'dropshippingadmin' && queryPass !== 'dropshippingadmin') {
+    if (!isAuthorized(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, error: 'Unauthorized: Invalid Passcode' }));
       return;
@@ -337,7 +419,15 @@ async function handleRequest(req, res) {
     const orders = readOrders();
     const paidOrders = orders.filter(o => o.status === 'PAID');
     const abandonedOrders = orders.filter(o => o.status === 'ABANDONED');
-    const totalRevenue = paidOrders.length * 199;
+    const contactedOrders = orders.filter(o => o.contacted === true || o.status === 'CONTACTED');
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + (Number(o.amount) || 1), 0);
+
+    // Calculate Today's Stats
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const todayOrders = orders.filter(o => new Date(o.date).getTime() >= startOfToday);
+    const todayPaid = todayOrders.filter(o => o.status === 'PAID');
+    const todayRevenue = todayPaid.reduce((sum, o) => sum + (Number(o.amount) || 1), 0);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -346,18 +436,144 @@ async function handleRequest(req, res) {
         totalOrders: orders.length,
         paidCount: paidOrders.length,
         abandonedCount: abandonedOrders.length,
+        contactedCount: contactedOrders.length,
         totalRevenue: totalRevenue,
-        conversionRate: orders.length > 0 ? ((paidOrders.length / orders.length) * 100).toFixed(1) : 0
+        recoverableRevenue: abandonedOrders.reduce((sum, o) => sum + (Number(o.amount) || 1), 0),
+        conversionRate: orders.length > 0 ? ((paidOrders.length / orders.length) * 100).toFixed(1) : 0,
+        todayCount: todayOrders.length,
+        todayPaidCount: todayPaid.length,
+        todayRevenue: todayRevenue
       },
       orders: orders
     }));
     return;
   }
 
-  // API 4: Get & Update Meta CAPI Settings
+  // API 4: Update Order (Status, Contacted tag, etc.)
+  if ((reqPath === '/api/admin/orders/update' || reqPath.endsWith('/admin/orders/update')) && req.method === 'POST') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    const data = await parseBody(req);
+    const orders = readOrders();
+    const target = orders.find(o => o.id === data.id);
+
+    if (!target) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Order not found' }));
+      return;
+    }
+
+    if (data.status) target.status = data.status;
+    if (typeof data.contacted === 'boolean') target.contacted = data.contacted;
+    if (data.name) target.name = data.name;
+    if (data.phone) target.phone = data.phone;
+    if (data.email) target.email = data.email;
+    if (data.payment_id) target.payment_id = data.payment_id;
+
+    saveOrders(orders);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, order: target }));
+    return;
+  }
+
+  // API 5: Create Order Manually
+  if ((reqPath === '/api/admin/orders/create' || reqPath.endsWith('/admin/orders/create')) && req.method === 'POST') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    const data = await parseBody(req);
+    const orders = readOrders();
+
+    const manualOrder = {
+      id: `ord_${Date.now()}`,
+      order_id: `manual_${Date.now()}`,
+      name: (data.name || 'Manual Customer').trim(),
+      email: (data.email || '').trim(),
+      phone: (data.phone || '').trim(),
+      amount: Number(data.amount) || 199,
+      status: data.status || 'PAID',
+      contacted: Boolean(data.contacted),
+      payment_id: data.payment_id || `manual_pay_${Date.now()}`,
+      date: new Date().toISOString()
+    };
+
+    orders.unshift(manualOrder);
+    saveOrders(orders);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, order: manualOrder }));
+    return;
+  }
+
+  // API 6: Delete Order
+  if ((reqPath === '/api/admin/orders/delete' || reqPath.endsWith('/admin/orders/delete')) && req.method === 'POST') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    const data = await parseBody(req);
+    let orders = readOrders();
+    const initialLen = orders.length;
+    orders = orders.filter(o => o.id !== data.id);
+
+    if (orders.length === initialLen) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Order not found' }));
+      return;
+    }
+
+    saveOrders(orders);
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Order deleted' }));
+    return;
+  }
+
+  // API 7: Bulk Sync / Restore Orders
+  if ((reqPath === '/api/admin/orders/sync' || reqPath.endsWith('/admin/orders/sync')) && req.method === 'POST') {
+    if (!isAuthorized(req)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
+      return;
+    }
+
+    const data = await parseBody(req);
+    const newItems = Array.isArray(data.orders) ? data.orders : [];
+    let currentOrders = readOrders();
+    const map = new Map();
+
+    // Preserve existing orders
+    for (let ord of currentOrders) {
+      if (ord.id) map.set(ord.id, ord);
+    }
+
+    // Merge incoming orders
+    for (let ord of newItems) {
+      if (ord.id) {
+        map.set(ord.id, Object.assign({}, map.get(ord.id) || {}, ord));
+      }
+    }
+
+    const merged = Array.from(map.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+    saveOrders(merged);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, count: merged.length }));
+    return;
+  }
+
+  // API 8: Get & Update Meta CAPI Settings
   if (reqPath === '/api/admin/capi-settings' || reqPath.endsWith('/admin/capi-settings')) {
-    const authHeader = req.headers['x-admin-passcode'] || '';
-    if (authHeader !== 'dropshippingadmin') {
+    if (!isAuthorized(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
       return;
@@ -389,10 +605,9 @@ async function handleRequest(req, res) {
     }
   }
 
-  // API 5: Send Test Event to Meta Conversions API
+  // API 9: Send Test Event to Meta Conversions API
   if ((reqPath === '/api/admin/capi-test' || reqPath.endsWith('/admin/capi-test')) && req.method === 'POST') {
-    const authHeader = req.headers['x-admin-passcode'] || '';
-    if (authHeader !== 'dropshippingadmin') {
+    if (!isAuthorized(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: false, error: 'Unauthorized' }));
       return;
@@ -413,10 +628,17 @@ async function handleRequest(req, res) {
     return;
   }
 
-  // If running on Vercel and not an API route, return 404 JSON (Vercel CDN serves static files)
-  if (isVercel) {
+  // If request begins with /api/ and wasn't handled, return a clean 404 JSON response
+  if (reqPath.startsWith('/api/')) {
     res.writeHead(404, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ success: false, error: 'Endpoint not found' }));
+    res.end(JSON.stringify({ success: false, error: `Endpoint not found: ${reqPath}` }));
+    return;
+  }
+
+  // If on Vercel CDN, static files are handled by Vercel edge
+  if (isVercel) {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('404 Not Found');
     return;
   }
 
@@ -424,7 +646,7 @@ async function handleRequest(req, res) {
   let targetPath = reqPath;
   if (targetPath === '/' || targetPath === '') {
     targetPath = '/index.html';
-  } else if (targetPath === '/admin' || targetPath === '/admin/') {
+  } else if (targetPath === '/admin' || targetPath === '/admin/' || targetPath === '/dashboard') {
     targetPath = '/admin.html';
   }
 

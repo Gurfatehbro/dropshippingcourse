@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dropship India Admin | Orders & Abandoned Follow-Ups</title>
+  <title>Dropship India | Advanced Executive Command Center</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,20 +11,37 @@
 
   <style>
     :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --surface-border: #334155;
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-elevated: #1a2234;
+      --surface-border: #222f46;
+      --surface-border-subtle: rgba(255, 255, 255, 0.07);
+      
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-light: #64748b;
+      
       --brand-blue: #3b82f6;
       --brand-blue-hover: #2563eb;
+      --brand-indigo: #6366f1;
+      
       --success: #10b981;
-      --success-soft: rgba(16, 185, 129, 0.15);
-      --danger: #ef4444;
-      --danger-soft: rgba(239, 68, 68, 0.15);
+      --success-soft: rgba(16, 185, 129, 0.12);
+      --success-border: rgba(16, 185, 129, 0.3);
+      
+      --danger: #f43f5e;
+      --danger-soft: rgba(244, 63, 94, 0.12);
+      --danger-border: rgba(244, 63, 94, 0.3);
+      
       --warning: #f59e0b;
+      --warning-soft: rgba(245, 158, 11, 0.12);
+      --warning-border: rgba(245, 158, 11, 0.3);
+      
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.12);
+      
       --font: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,318 +50,528 @@
       background-color: var(--bg);
       color: var(--text-main);
       line-height: 1.5;
-      padding: 30px 20px;
+      padding: 24px 20px 60px;
+      min-height: 100vh;
     }
 
     .admin-container {
-      max-width: 1200px;
+      max-width: 1320px;
       margin: 0 auto;
     }
 
-    /* Header */
-    .admin-header {
+    /* Top Utility Header */
+    .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 28px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--surface-border);
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
     }
-    .admin-brand {
+
+    .brand-section {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
-    .admin-badge {
-      background: var(--brand-blue);
-      color: #fff;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 4px;
-      text-transform: uppercase;
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     }
-    .admin-title {
-      font-size: 1.5rem;
+
+    .brand-title {
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.02em;
-    }
-    .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .btn {
-      padding: 9px 18px;
-      font-size: 0.85rem;
+      padding: 8px 16px;
+      font-size: 0.82rem;
       font-weight: 700;
       border-radius: 8px;
       cursor: pointer;
       border: none;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       transition: all 0.2s ease;
+      text-decoration: none;
+      user-select: none;
     }
-    .btn-primary { background: var(--brand-blue); color: #fff; }
-    .btn-primary:hover { background: var(--brand-blue-hover); }
-    .btn-secondary { background: var(--surface); color: var(--text-main); border: 1px solid var(--surface-border); }
-    .btn-secondary:hover { background: #334155; }
 
-    /* KPI Grid */
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+    }
+
+    .btn-emerald {
+      background: #059669;
+      color: #fff;
+    }
+    .btn-emerald:hover { background: #047857; }
+
+    .btn-secondary {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--surface-border);
+    }
+    .btn-secondary:hover {
+      background: #232f48;
+      border-color: #334155;
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .btn-danger-outline:hover {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: #f87171;
+    }
+
+    /* Live Domain Info Bar */
+    .domain-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px dashed var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 16px;
+      margin-bottom: 24px;
+      font-size: 0.8rem;
+    }
+
+    .domain-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+    }
+
+    .domain-tag {
+      font-family: var(--font-mono);
+      color: #60a5fa;
+      font-weight: 700;
+      background: #0f172a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--surface-border);
+    }
+
+    /* Executive KPI Grid */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
     }
+
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px;
       position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
     }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(99, 102, 241, 0.4);
+    }
+
     .stat-label {
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.72rem;
+      font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-    .stat-sub {
-      font-size: 0.75rem;
-      color: var(--text-light);
-    }
-    .val-paid { color: var(--success); }
-    .val-rev { color: #60a5fa; }
-    .val-abandoned { color: var(--danger); }
 
-    /* Follow Up Scripts Accordion / Banner */
-    .scripts-banner {
+    .stat-value {
+      font-size: 1.85rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .val-rev { color: #60a5fa; }
+    .val-paid { color: #34d399; }
+    .val-abandoned { color: #f87171; }
+    .val-recover { color: #fbbf24; }
+    .val-conv { color: #c084fc; }
+
+    /* Collapsible Sections */
+    .dashboard-accordion {
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: 12px;
-      padding: 22px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      overflow: hidden;
     }
-    .scripts-header {
+
+    .accordion-header {
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.01);
+      transition: background 0.2s;
     }
-    .scripts-title {
-      font-size: 1.05rem;
+
+    .accordion-header:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .accordion-title {
+      font-size: 0.95rem;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 10px;
     }
+
+    .accordion-content {
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    /* WhatsApp Templates Grid */
     .scripts-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
       margin-top: 18px;
     }
+
     .script-item {
-      background: #0f172a;
+      background: #0a0f1d;
       border: 1px solid var(--surface-border);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    .script-name {
-      font-size: 0.82rem;
-      font-weight: 700;
+
+    .script-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       color: #60a5fa;
       margin-bottom: 6px;
     }
+
+    .script-name {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
     .script-body {
-      font-family: var(--font);
-      font-size: 0.83rem;
+      font-size: 0.78rem;
       color: #cbd5e1;
+      line-height: 1.45;
       margin-bottom: 12px;
       white-space: pre-line;
-      line-height: 1.5;
+      flex-grow: 1;
+      font-family: var(--font);
     }
-    .copy-btn {
-      background: #1e293b;
-      color: #94a3b8;
-      border: 1px solid #334155;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-    .copy-btn:hover { color: #fff; background: #334155; }
 
-    /* Orders Table Area */
+    /* Orders Management Table Area */
     .orders-area {
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: 14px;
       overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
+
     .table-toolbar {
-      padding: 18px 22px;
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
       border-bottom: 1px solid var(--surface-border);
+      background: rgba(15, 23, 42, 0.4);
     }
+
     .tab-pills {
       display: flex;
-      background: #0f172a;
+      background: #090e1a;
       padding: 4px;
       border-radius: 8px;
       border: 1px solid var(--surface-border);
+      gap: 2px;
     }
+
     .tab-item {
       padding: 6px 14px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
       background: none;
       border: none;
       color: var(--text-muted);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
     }
+
     .tab-item.active {
       background: var(--brand-blue);
       color: #fff;
     }
+
+    .tab-count {
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .table-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .search-input {
-      background: #0f172a;
+      background: #0a0f1d;
       border: 1px solid var(--surface-border);
       color: #fff;
       padding: 8px 14px;
       border-radius: 8px;
-      font-size: 0.85rem;
-      width: 260px;
+      font-size: 0.82rem;
+      width: 250px;
+      outline: none;
     }
     .search-input:focus {
-      outline: none;
       border-color: var(--brand-blue);
     }
 
-    /* Table */
+    .select-dropdown {
+      background: #0a0f1d;
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Table Styles */
     .orders-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.88rem;
+      font-size: 0.84rem;
     }
+
     .orders-table th {
-      background: #172033;
+      background: #0e1526;
       color: var(--text-muted);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.05em;
-      padding: 14px 22px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--surface-border);
     }
+
     .orders-table td {
-      padding: 16px 22px;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(34, 47, 70, 0.6);
       vertical-align: middle;
     }
+
     .orders-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.015);
     }
 
     /* Badges */
     .status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+      gap: 5px;
+      padding: 3px 9px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.04em;
+      cursor: pointer;
+      user-select: none;
     }
+
     .status-paid {
       background: var(--success-soft);
       color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid var(--success-border);
     }
+
     .status-abandoned {
       background: var(--danger-soft);
       color: var(--danger);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border: 1px solid var(--danger-border);
     }
 
-    .wa-btn {
+    .status-contacted {
+      background: var(--warning-soft);
+      color: var(--warning);
+      border: 1px solid var(--warning-border);
+    }
+
+    .btn-wa-action {
       background: #128c7e;
       color: #fff;
       padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
+      font-size: 0.75rem;
+      font-weight: 800;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       transition: background 0.2s;
+      border: none;
+      cursor: pointer;
     }
-    .wa-btn:hover {
+    .btn-wa-action:hover {
       background: #075e54;
     }
 
-    @media (max-width: 900px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .scripts-grid { grid-template-columns: 1fr; }
+    .action-icon-btn {
+      background: #0f172a;
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.15s;
     }
-    @media (max-width: 600px) {
-      .stats-grid { grid-template-columns: 1fr; }
-      .table-toolbar { flex-direction: column; align-items: stretch; }
-      .search-input { width: 100%; }
+    .action-icon-btn:hover {
+      color: #fff;
+      border-color: #3b82f6;
+      background: #1e293b;
     }
 
     /* Passcode Gate Overlay */
     #lockOverlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at center, #1e293b 0%, #070b14 100%);
+      background: radial-gradient(circle at center, #17233a 0%, #060911 100%);
       z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
     }
+
     .lock-card {
-      background: rgba(30, 41, 59, 0.95);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.2);
-      border-radius: 18px;
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 35px rgba(59, 130, 246, 0.2);
+      border-radius: 20px;
       padding: 40px 32px;
       width: 100%;
       max-width: 420px;
       text-align: center;
-      position: relative;
     }
+
     .lock-icon-wrap {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       background: rgba(59, 130, 246, 0.15);
       border: 1px solid rgba(59, 130, 246, 0.3);
@@ -354,82 +581,204 @@
       font-size: 1.8rem;
       margin: 0 auto 16px;
     }
-    .lock-badge {
-      display: inline-block;
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 999px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-    }
+
     .lock-title {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: #fff;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
+
     .lock-subtitle {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       margin-bottom: 24px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
+
     .passcode-input {
       width: 100%;
-      background: #0f172a;
+      background: #0a0e19;
       border: 1.5px solid var(--surface-border);
       color: #fff;
       padding: 12px 16px;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 1.05rem;
       text-align: center;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
+      outline: none;
       transition: all 0.2s ease;
       margin-bottom: 14px;
     }
     .passcode-input:focus {
-      outline: none;
       border-color: var(--brand-blue);
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     }
+
     .passcode-submit-btn {
       width: 100%;
       padding: 12px;
-      background: var(--brand-blue);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 800;
       cursor: pointer;
-      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      transition: transform 0.2s;
     }
     .passcode-submit-btn:hover {
-      background: var(--brand-blue-hover);
       transform: translateY(-1px);
     }
+
     .passcode-error {
-      color: #ef4444;
-      font-size: 0.82rem;
+      color: #f87171;
+      font-size: 0.8rem;
       font-weight: 600;
       margin-top: 12px;
       min-height: 20px;
     }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
+
+    /* Modal Component */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    .shake-anim {
-      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: #fff; }
+
+    .modal-body {
+      padding: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      background: #0a0e19;
+      border: 1px solid var(--surface-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .form-control:focus {
+      border-color: var(--brand-blue);
+    }
+
+    /* Terminal Console */
+    .terminal-box {
+      background: #060911;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #38bdf8;
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* Toast Notification */
+    #toastNotice {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid var(--surface-border);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      z-index: 999999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #toastNotice.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+      .scripts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .scripts-grid { grid-template-columns: 1fr; }
+      .top-bar { flex-direction: column; align-items: stretch; }
+      .table-toolbar { flex-direction: column; align-items: stretch; }
+      .search-input { width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -438,10 +787,12 @@
   <!-- Passcode Gate Overlay -->
   <div id="lockOverlay">
     <div class="lock-card">
-      <div class="lock-icon-wrap">🔒</div>
-      <span class="lock-badge">Admin Security</span>
-      <h2 class="lock-title">Enter Admin Passcode</h2>
-      <p class="lock-subtitle">Access to Dropship India orders, revenue, and abandoned checkout follow-ups is restricted.</p>
+      <div class="lock-icon-wrap">🛡️</div>
+      <div style="font-size: 0.72rem; font-weight: 800; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+        Dropship India Admin
+      </div>
+      <h2 class="lock-title">Mission Control Access</h2>
+      <p class="lock-subtitle">Access to live customer orders, revenue analytics, and lead recovery automation is restricted.</p>
       
       <form onsubmit="event.preventDefault(); unlockAdmin();">
         <input 
@@ -462,136 +813,197 @@
 
   <div class="admin-container" id="adminContent" style="display: none;">
 
-    <!-- Header -->
-    <header class="admin-header">
-      <div class="admin-brand">
-        <div class="admin-title">🌐 Dropship India</div>
-        <span class="admin-badge">Admin Panel</span>
-        <span style="font-size: 0.75rem; color: #10b981; margin-left: 8px;">● Live Tracking Active</span>
+    <!-- Top Navigation & Brand Bar -->
+    <header class="top-bar">
+      <div class="brand-section">
+        <div class="brand-logo">🌐</div>
+        <div>
+          <div class="brand-title">
+            <span>Dropship India</span>
+            <span style="font-size: 0.75rem; background: var(--surface-elevated); color: #94a3b8; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--surface-border);">v2.4 Executive</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 3px;">
+            <div class="status-pill" id="serverStatusPill">
+              <span class="status-dot"></span>
+              <span id="serverStatusText">Connecting...</span>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-light);" id="autoRefreshCountdown">Auto-sync: 10s</span>
+          </div>
+        </div>
       </div>
 
-      <div class="header-actions">
-        <button class="btn btn-secondary" onclick="loadOrders()">🔄 Refresh</button>
-        <button class="btn btn-secondary" onclick="exportCsv()">📥 Export CSV</button>
-        <a href="/" target="_blank" class="btn btn-primary">Visit Store &rarr;</a>
-        <button class="btn btn-secondary" onclick="logoutAdmin()" title="Lock Dashboard" style="border-color: #ef4444; color: #ef4444;">🔒 Lock</button>
+      <div class="top-actions">
+        <button class="btn btn-secondary" onclick="loadOrders(true)">🔄 Sync Now</button>
+        <button class="btn btn-emerald" onclick="openModal('modalAddOrder')">➕ Add Lead</button>
+        <button class="btn btn-secondary" onclick="openModal('modalSettings')">⚙️ Settings</button>
+        <button class="btn btn-primary" onclick="visitStore()" title="Open Live Store in New Tab">Visit Store ↗</button>
+        <button class="btn btn-danger-outline" onclick="logoutAdmin()" title="Lock Admin Session">🔒 Lock</button>
       </div>
     </header>
 
-    <!-- Key Stats Metrics -->
+    <!-- Multi-URL & Domain Indicator Banner -->
+    <section class="domain-bar">
+      <div class="domain-info">
+        <span>📍 <strong>Active Store Origin:</strong></span>
+        <span class="domain-tag" id="activeStoreDomain">Detecting...</span>
+        <span style="color: var(--text-light); font-size: 0.75rem;">(All WhatsApp recovery links dynamically bind to this URL)</span>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="openModal('modalBackup')">💾 Backup & Restore</button>
+      </div>
+    </section>
+
+    <!-- Executive KPI Grid -->
     <section class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">Total Revenue</div>
+        <div class="stat-label">
+          <span>Gross Revenue</span>
+          <span style="font-size: 0.9rem;">💰</span>
+        </div>
         <div class="stat-value val-rev" id="statRevenue">₹0</div>
-        <div class="stat-sub">From Completed ₹199 Orders</div>
+        <div class="stat-sub">From Verified Razorpay Payments</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Paid Orders</div>
+        <div class="stat-label">
+          <span>Paid Orders</span>
+          <span style="font-size: 0.9rem;">✅</span>
+        </div>
         <div class="stat-value val-paid" id="statPaid">0</div>
-        <div class="stat-sub">Razorpay Verified Customers</div>
+        <div class="stat-sub" id="statPaidSub">0% of total leads</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Abandoned Checkouts</div>
+        <div class="stat-label">
+          <span>Abandoned Leads</span>
+          <span style="font-size: 0.9rem;">⚠️</span>
+        </div>
         <div class="stat-value val-abandoned" id="statAbandoned">0</div>
-        <div class="stat-sub">Hot Leads (Follow-Up Needed)</div>
+        <div class="stat-sub">High-Intent Unfinished Checkouts</div>
       </div>
 
       <div class="stat-card">
-        <div class="stat-label">Conversion Rate</div>
-        <div class="stat-value" id="statConversion">0%</div>
-        <div class="stat-sub">Checkout Completion Ratio</div>
+        <div class="stat-label">
+          <span>Recoverable Pipeline</span>
+          <span style="font-size: 0.9rem;">📈</span>
+        </div>
+        <div class="stat-value val-recover" id="statRecoverable">₹0</div>
+        <div class="stat-sub">Pending WhatsApp Conversion</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">
+          <span>Conversion Rate</span>
+          <span style="font-size: 0.9rem;">🎯</span>
+        </div>
+        <div class="stat-value val-conv" id="statConversion">0%</div>
+        <div class="stat-sub" id="statTodayMetric">Today: 0 paid</div>
       </div>
     </section>
 
-    <!-- Follow Up Message Templates -->
-    <section class="scripts-banner">
-      <div class="scripts-header">
-        <div class="scripts-title">
-          <span>💬 Ready-to-Send WhatsApp Follow-Up Templates</span>
+    <!-- WhatsApp Follow-Up Templates Drawer -->
+    <section class="dashboard-accordion">
+      <div class="accordion-header" onclick="toggleAccordion('accordionTemplates')">
+        <div class="accordion-title">
+          <span>💬 High-Converting WhatsApp Follow-Up Templates</span>
+          <span style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; font-weight: 800;">4 PROVEN HOOKS</span>
         </div>
-        <span style="font-size: 0.8rem; color: var(--text-light);">Click 'Copy' or use the green WhatsApp button on any abandoned order below</span>
+        <span style="font-size: 0.8rem; color: var(--text-light);" id="accordionTemplatesIcon">▼ Click to Expand</span>
       </div>
 
-      <div class="scripts-grid">
-        <div class="script-item">
-          <div>
-            <div class="script-name">Template 1: Friendly Payment Check (Recommended)</div>
-            <div class="script-body" id="script1">Hey [NAME]! 👋 Saw that you were checking out the "International Dropshipping Blueprint", but your payment of ₹199 got interrupted.
+      <div class="accordion-content" id="accordionTemplates" style="display: block;">
+        <div class="scripts-grid">
+          <div class="script-item">
+            <span class="script-badge">Hook 01 • Recommended</span>
+            <div class="script-name">Friendly Payment Assist</div>
+            <div class="script-body" id="script1">Hey [NAME]! 👋 Saw that you were checking out the International Dropshipping Blueprint (₹1), but your checkout wasn't completed.
 
-Is everything okay with your UPI / Card? Here is the direct link to complete it and get the 5 bonus scripts:
-👉 http://localhost:3000
+Is everything okay with UPI or Card? Here is the link to finish and get your 5 bonus scripts:
+👉 [STORE_URL]
 
 Let me know if you need any help!</div>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="copyTemplateText('script1')">Copy Message</button>
           </div>
-          <button class="copy-btn" onclick="copyText('script1')">Copy Message</button>
-        </div>
 
-        <div class="script-item">
-          <div>
-            <div class="script-name">Template 2: Hindi / Direct Solution</div>
-            <div class="script-body" id="script2">Hi [NAME], Gurfateh here from Dropship India!
+          <div class="script-item">
+            <span class="script-badge">Hook 02 • High Urgency</span>
+            <div class="script-name">20-Min Bonus Lock</div>
+            <div class="script-body" id="script2">Hi [NAME]! ⚡ Gurfateh here from Dropship India.
 
-Maine dekha aap international dropshipping blueprint check kar rahe the but order complete nahi hua.
+I noticed your payment got interrupted. If you complete your ₹1 order within the next 20 mins, I'll personally unlock the Tier-1 Private Agent WeChat contact list for free:
+👉 [STORE_URL]
 
-Agar payment me koi issue aa raha tha (UPI ya Card), to batayein I can help you out.
-Link: http://localhost:3000</div>
+Reply "DONE" after ordering!</div>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="copyTemplateText('script2')">Copy Message</button>
           </div>
-          <button class="copy-btn" onclick="copyText('script2')">Copy Message</button>
-    </section>
 
-    <!-- Meta Pixel & Conversions API (CAPI) Control Box -->
-    <section class="scripts-banner" style="border-color: rgba(59, 130, 246, 0.4); margin-bottom: 28px;">
-      <div class="scripts-header">
-        <div class="scripts-title">
-          <span>🎯 Meta Pixel & Conversions API (CAPI) Engine</span>
-          <span style="font-size: 0.72rem; background: #059669; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: 800; margin-left: 8px;">ACTIVE</span>
-        </div>
-        <span style="font-size: 0.8rem; color: var(--text-light);">Pixel ID: <strong style="color: #60a5fa;" id="capiPixelIdDisplay">4879107795666392</strong></span>
-      </div>
+          <div class="script-item">
+            <span class="script-badge">Hook 03 • Hindi Personal</span>
+            <div class="script-name">Founder Direct Solution</div>
+            <div class="script-body" id="script3">Hi [NAME], Gurfateh here!
 
-      <div style="margin-top: 16px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;">
-        <div style="background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--surface-border);">
-          <div style="font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">Conversions API Access Token</div>
-          <input type="password" id="capiAccessTokenInput" class="search-input" style="width: 100%; margin-bottom: 12px; font-family: monospace; font-size: 0.8rem;" placeholder="Paste Meta CAPI Access Token (EAAB...)">
-          
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="btn btn-primary" style="padding: 7px 14px; font-size: 0.8rem;" onclick="saveCapiSettings()">Save Settings</button>
-            <span id="capiSaveStatus" style="font-size: 0.78rem; color: #10b981;"></span>
-          </div>
-          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 8px;">
-            Get token from: Meta Events Manager &gt; Pixel Settings &gt; Conversions API &gt; "Generate access token"
-          </div>
-        </div>
+Maine dekha aap international dropshipping blueprint check kar rahe the but order incomplete reh gaya.
 
-        <div style="background: #0f172a; padding: 18px; border-radius: 8px; border: 1px solid var(--surface-border); display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="font-size: 0.82rem; font-weight: 700; color: #cbd5e1; margin-bottom: 8px;">Test Event Code (Optional)</div>
-            <input type="text" id="capiTestCodeInput" class="search-input" style="width: 100%; margin-bottom: 12px; font-size: 0.8rem;" placeholder="e.g. TEST12345 (from Test Events tab)">
+Agar UPI ya Card me koi issue aa raha tha, to mujhe batayein I can help you out.
+Link: [STORE_URL]</div>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="copyTemplateText('script3')">Copy Message</button>
           </div>
-          
-          <div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-primary" style="flex: 1; font-size: 0.78rem; background: #059669;" onclick="testCapiEvent('Purchase')">💳 Send Test Purchase (₹199)</button>
-              <button class="btn btn-secondary" style="flex: 1; font-size: 0.78rem;" onclick="testCapiEvent('InitiateCheckout')">⚡ Test Checkout</button>
-            </div>
-            <div id="capiTestResult" style="font-size: 0.75rem; margin-top: 6px; word-break: break-all;"></div>
+
+          <div class="script-item">
+            <span class="script-badge">Hook 04 • UPI QR Fast Pay</span>
+            <div class="script-name">Direct UPI Recovery</div>
+            <div class="script-body" id="script4">Hey [NAME]! Did your bank app fail during payment?
+
+You can directly finish checkout on our secure portal or pay ₹1 via UPI:
+👉 [STORE_URL]
+
+Send screenshot here once completed to receive your PDF + 5 bonuses instantly.</div>
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="copyTemplateText('script4')">Copy Message</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Orders Table Area -->
+    <!-- Orders & Abandoned Checkouts Table -->
     <section class="orders-area">
       <div class="table-toolbar">
         <div class="tab-pills">
-          <button class="tab-item active" id="tabAll" onclick="setFilter('ALL')">All (<span id="countAll">0</span>)</button>
-          <button class="tab-item" id="tabPaid" onclick="setFilter('PAID')">Paid (<span id="countPaid">0</span>)</button>
-          <button class="tab-item" id="tabAbandoned" onclick="setFilter('ABANDONED')">Abandoned (<span id="countAbandoned">0</span>)</button>
+          <button class="tab-item active" id="tabAll" onclick="setFilter('ALL')">
+            <span>All Leads</span>
+            <span class="tab-count" id="countAll">0</span>
+          </button>
+          <button class="tab-item" id="tabPaid" onclick="setFilter('PAID')">
+            <span>🟢 Paid</span>
+            <span class="tab-count" id="countPaid">0</span>
+          </button>
+          <button class="tab-item" id="tabAbandoned" onclick="setFilter('ABANDONED')">
+            <span>🔴 Abandoned</span>
+            <span class="tab-count" id="countAbandoned">0</span>
+          </button>
+          <button class="tab-item" id="tabContacted" onclick="setFilter('CONTACTED')">
+            <span>💬 Contacted</span>
+            <span class="tab-count" id="countContacted">0</span>
+          </button>
         </div>
 
-        <input type="text" id="searchInput" class="search-input" placeholder="Search by name, email, phone..." oninput="renderTable()">
+        <div class="table-controls">
+          <select id="dateFilterSelect" class="select-dropdown" onchange="renderTable()">
+            <option value="ALL">All Time</option>
+            <option value="TODAY">Today Only</option>
+            <option value="YESTERDAY">Yesterday</option>
+            <option value="WEEK">Last 7 Days</option>
+          </select>
+
+          <input 
+            type="text" 
+            id="searchInput" 
+            class="search-input" 
+            placeholder="Search name, phone, email, ID..." 
+            oninput="renderTable()"
+          >
+
+          <button class="btn btn-secondary" onclick="exportCsv()" title="Download CSV for Excel">📥 Export CSV</button>
+        </div>
       </div>
 
       <div style="overflow-x: auto;">
@@ -602,14 +1014,14 @@ Link: http://localhost:3000</div>
               <th>Contact Details</th>
               <th>Date & Time</th>
               <th>Amount</th>
-              <th>Status</th>
-              <th>Payment ID / Action</th>
+              <th>Status (Click to toggle)</th>
+              <th>Instant Action</th>
             </tr>
           </thead>
           <tbody id="ordersTbody">
             <tr>
               <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                Loading orders...
+                Loading orders from live server...
               </td>
             </tr>
           </tbody>
@@ -619,12 +1031,191 @@ Link: http://localhost:3000</div>
 
   </div>
 
+  <!-- Modal: Manual Add Order / Lead -->
+  <div class="modal-overlay" id="modalAddOrder">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">➕ Add Order or Lead Manually</div>
+        <button class="modal-close" onclick="closeModal('modalAddOrder')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="event.preventDefault(); submitManualOrder();">
+          <div class="form-group">
+            <label class="form-label">Customer Name</label>
+            <input type="text" id="manualName" class="form-control" placeholder="e.g. Rahul Sharma" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number (10 Digits)</label>
+            <input type="text" id="manualPhone" class="form-control" placeholder="e.g. 9876543210" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" id="manualEmail" class="form-control" placeholder="e.g. rahul@gmail.com">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="manualStatus" class="form-control">
+                <option value="PAID">🟢 PAID (Completed)</option>
+                <option value="ABANDONED">🔴 ABANDONED (Follow-up)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (₹)</label>
+              <input type="number" id="manualAmount" class="form-control" value="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment ID (Optional)</label>
+            <input type="text" id="manualPayId" class="form-control" placeholder="e.g. pay_manual_01">
+          </div>
+          <button type="submit" class="btn btn-emerald" style="width: 100%; justify-content: center; padding: 12px;">Save Order to Database</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Settings & Multi-URL Configuration -->
+  <div class="modal-overlay" id="modalSettings">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">⚙️ Dashboard & Multi-URL Settings</div>
+        <button class="modal-close" onclick="closeModal('modalSettings')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Custom Store Recovery URL (Override Origin)</label>
+          <input type="text" id="settingStoreUrl" class="form-control" placeholder="Leave empty for auto-detected origin">
+          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 4px;">
+            Default: Auto-detected (<code><span id="detectedOriginPreview"></span></code>). Change this if you want WhatsApp recovery messages to direct customers to a specific domain.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Backend API URL (For Remote Admin)</label>
+          <input type="text" id="settingApiUrl" class="form-control" placeholder="Default: Same origin (/api)">
+          <div style="font-size: 0.72rem; color: var(--text-light); margin-top: 4px;">
+            Allows running this admin dashboard as a standalone app or file on your computer pointing to your live Vercel backend.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Auto-Refresh Interval</label>
+          <select id="settingAutoRefresh" class="form-control" onchange="changeAutoRefreshInterval(this.value)">
+            <option value="5000">Every 5 Seconds (High Frequency)</option>
+            <option value="10000" selected>Every 10 Seconds (Recommended)</option>
+            <option value="30000">Every 30 Seconds</option>
+            <option value="60000">Every 1 Minute</option>
+            <option value="0">Off (Manual Refresh Only)</option>
+          </select>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--surface-border); margin: 20px 0;">
+
+        <!-- Meta CAPI Quick Settings -->
+        <div class="modal-title" style="margin-bottom: 14px; font-size: 0.95rem;">🎯 Meta Pixel & CAPI Credentials</div>
+        
+        <div class="form-group">
+          <label class="form-label">Conversions API Access Token</label>
+          <input type="password" id="capiAccessTokenInput" class="form-control" placeholder="● Token active & configured (paste to update)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Test Event Code (Optional)</label>
+          <input type="text" id="capiTestCodeInput" class="form-control" placeholder="e.g. TEST69070">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+          <button class="btn btn-primary" style="flex: 1;" onclick="saveSettings()">Save All Settings</button>
+          <button class="btn btn-emerald" style="flex: 1;" onclick="triggerCapiTest('Purchase')">⚡ Test CAPI Purchase</button>
+        </div>
+
+        <div id="capiConsole" class="terminal-box" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Backup & Restore -->
+  <div class="modal-overlay" id="modalBackup">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">💾 Backup, Restore & Cloud Sync</div>
+        <button class="modal-close" onclick="closeModal('modalBackup')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.83rem; color: var(--text-muted); margin-bottom: 18px;">
+          Your orders are automatically cached locally in your browser so you never lose leads even if serverless containers restart. Use the tools below to export or restore backups anytime.
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button class="btn btn-secondary" style="padding: 12px; justify-content: center;" onclick="downloadJsonBackup()">
+            📥 Download Full JSON Backup
+          </button>
+          
+          <button class="btn btn-secondary" style="padding: 12px; justify-content: center;" onclick="document.getElementById('importJsonFile').click()">
+            📤 Restore Orders from JSON Backup
+          </button>
+          <input type="file" id="importJsonFile" accept=".json" style="display: none;" onchange="handleImportJson(event)">
+
+          <button class="btn btn-emerald" style="padding: 12px; justify-content: center;" onclick="syncBrowserCacheToServer()">
+            🔄 Force Push Local Cache to Server Database
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div id="toastNotice">
+    <span id="toastIcon">✓</span>
+    <span id="toastMsg">Action completed successfully</span>
+  </div>
+
   <script>
     const REQUIRED_PASSCODE = 'dropshippingadmin';
+    const CACHE_KEY = 'dropship_admin_orders_cache';
+    const SETTINGS_KEY = 'dropship_admin_settings';
+
     let allOrders = [];
     let currentFilter = 'ALL';
+    let autoRefreshTimer = null;
+    let refreshIntervalMs = 10000;
+    let countdownSecs = 10;
+    let countdownInterval = null;
+
+    // Load initial settings
+    let adminSettings = {
+      customStoreUrl: '',
+      customApiUrl: '',
+      refreshInterval: 10000
+    };
+
+    try {
+      const savedSettings = localStorage.getItem(SETTINGS_KEY);
+      if (savedSettings) adminSettings = Object.assign(adminSettings, JSON.parse(savedSettings));
+    } catch(e) {}
+
+    function getStoreUrl() {
+      if (adminSettings.customStoreUrl && adminSettings.customStoreUrl.trim()) {
+        return adminSettings.customStoreUrl.trim().replace(/\/$/, '');
+      }
+      return window.location.origin;
+    }
+
+    function getApiBase() {
+      if (adminSettings.customApiUrl && adminSettings.customApiUrl.trim()) {
+        return adminSettings.customApiUrl.trim().replace(/\/$/, '');
+      }
+      return '';
+    }
 
     function getSavedPasscode() {
+      const searchParams = new URLSearchParams(window.location.search);
+      const urlPass = searchParams.get('passcode');
+      if (urlPass === REQUIRED_PASSCODE) {
+        sessionStorage.setItem('admin_passcode', urlPass);
+        return urlPass;
+      }
       return sessionStorage.getItem('admin_passcode') || '';
     }
 
@@ -636,8 +1227,26 @@ Link: http://localhost:3000</div>
       if (saved === REQUIRED_PASSCODE) {
         overlay.style.display = 'none';
         content.style.display = 'block';
+
+        // Update active store domain display
+        document.getElementById('activeStoreDomain').textContent = getStoreUrl();
+        const previewEl = document.getElementById('detectedOriginPreview');
+        if (previewEl) previewEl.textContent = window.location.origin;
+
+        // Populate settings inputs
+        const settingStoreInput = document.getElementById('settingStoreUrl');
+        if (settingStoreInput) settingStoreInput.value = adminSettings.customStoreUrl || '';
+        const settingApiInput = document.getElementById('settingApiUrl');
+        if (settingApiInput) settingApiInput.value = adminSettings.customApiUrl || '';
+
+        // Load cached orders instantly for zero flicker
+        loadLocalCache();
+        renderTable();
+
+        // Fetch fresh orders & CAPI config
         loadOrders();
         loadCapiSettings();
+        startAutoRefresh();
         return true;
       } else {
         overlay.style.display = 'flex';
@@ -654,7 +1263,6 @@ Link: http://localhost:3000</div>
     function unlockAdmin() {
       const input = document.getElementById('passcodeInput');
       const errEl = document.getElementById('passcodeError');
-      const card = document.querySelector('.lock-card');
       const entered = (input.value || '').trim();
 
       if (entered === REQUIRED_PASSCODE) {
@@ -663,11 +1271,6 @@ Link: http://localhost:3000</div>
         checkAuth();
       } else {
         errEl.textContent = '❌ Incorrect passcode. Please try again.';
-        if (card) {
-          card.classList.remove('shake-anim');
-          void card.offsetWidth; // force DOM reflow
-          card.classList.add('shake-anim');
-        }
         input.focus();
         input.select();
       }
@@ -678,15 +1281,42 @@ Link: http://localhost:3000</div>
       checkAuth();
     }
 
-    async function loadOrders() {
+    // Local Storage Cache Management
+    function loadLocalCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allOrders = parsed;
+            recalculateLocalStats();
+          }
+        }
+      } catch (e) {}
+    }
+
+    function saveLocalCache() {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(allOrders));
+      } catch (e) {}
+    }
+
+    // API: Fetch Orders
+    async function loadOrders(isManual = false) {
       const passcode = getSavedPasscode();
       if (passcode !== REQUIRED_PASSCODE) return;
 
+      const pillText = document.getElementById('serverStatusText');
+      const dot = document.querySelector('.status-dot');
+
+      if (isManual) {
+        pillText.textContent = 'Syncing...';
+      }
+
       try {
-        const res = await fetch('/api/admin/orders', {
-          headers: {
-            'X-Admin-Passcode': passcode
-          }
+        const apiUrl = `${getApiBase()}/api/admin/orders`;
+        const res = await fetch(apiUrl, {
+          headers: { 'X-Admin-Passcode': passcode }
         });
 
         if (res.status === 401) {
@@ -694,15 +1324,325 @@ Link: http://localhost:3000</div>
           return;
         }
 
+        if (!res.ok) {
+          throw new Error(`Server returned HTTP ${res.status}`);
+        }
+
         const data = await res.json();
         if (data.success) {
-          allOrders = data.orders;
+          pillText.textContent = 'Live Server Connected';
+          if (dot) dot.style.background = '#10b981';
+
+          // Merge server orders with local cache by ID
+          const orderMap = new Map();
+          for (let o of allOrders) { if (o.id) orderMap.set(o.id, o); }
+          for (let o of (data.orders || [])) { if (o.id) orderMap.set(o.id, o); }
+
+          allOrders = Array.from(orderMap.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+          saveLocalCache();
+
           updateStats(data.stats);
           renderTable();
+
+          if (isManual) showToast('✓ Synced with live server database');
         }
       } catch (err) {
-        console.error('Failed to load orders:', err);
+        console.warn('Orders sync notice:', err.message);
+        pillText.textContent = 'Offline / Cached Mode';
+        if (dot) dot.style.background = '#f59e0b';
+        recalculateLocalStats();
+        renderTable();
       }
+    }
+
+    function updateStats(stats) {
+      if (!stats) return;
+      document.getElementById('statRevenue').textContent = `₹${(stats.totalRevenue || 0).toLocaleString('en-IN')}`;
+      document.getElementById('statPaid').textContent = stats.paidCount || 0;
+      document.getElementById('statAbandoned').textContent = stats.abandonedCount || 0;
+      document.getElementById('statRecoverable').textContent = `₹${(stats.recoverableRevenue || (stats.abandonedCount * 199) || 0).toLocaleString('en-IN')}`;
+      document.getElementById('statConversion').textContent = `${stats.conversionRate || 0}%`;
+
+      document.getElementById('countAll').textContent = stats.totalOrders || allOrders.length;
+      document.getElementById('countPaid').textContent = stats.paidCount || 0;
+      document.getElementById('countAbandoned').textContent = stats.abandonedCount || 0;
+      document.getElementById('countContacted').textContent = stats.contactedCount || 0;
+
+      const paidPct = stats.totalOrders > 0 ? ((stats.paidCount / stats.totalOrders) * 100).toFixed(0) : 0;
+      document.getElementById('statPaidSub').textContent = `${paidPct}% checkout conversion`;
+
+      if (stats.todayPaidCount !== undefined) {
+        document.getElementById('statTodayMetric').textContent = `Today: ${stats.todayPaidCount} paid (₹${(stats.todayRevenue || 0).toLocaleString('en-IN')})`;
+      }
+    }
+
+    function recalculateLocalStats() {
+      const paid = allOrders.filter(o => o.status === 'PAID');
+      const abandoned = allOrders.filter(o => o.status === 'ABANDONED');
+      const contacted = allOrders.filter(o => o.contacted === true || o.status === 'CONTACTED');
+      const totalRev = paid.reduce((sum, o) => sum + (Number(o.amount) || 199), 0);
+
+      updateStats({
+        totalOrders: allOrders.length,
+        paidCount: paid.length,
+        abandonedCount: abandoned.length,
+        contactedCount: contacted.length,
+        totalRevenue: totalRev,
+        recoverableRevenue: abandoned.length * 199,
+        conversionRate: allOrders.length > 0 ? ((paid.length / allOrders.length) * 100).toFixed(1) : 0,
+        todayPaidCount: 0,
+        todayRevenue: 0
+      });
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.getElementById('tabAll').classList.toggle('active', filter === 'ALL');
+      document.getElementById('tabPaid').classList.toggle('active', filter === 'PAID');
+      document.getElementById('tabAbandoned').classList.toggle('active', filter === 'ABANDONED');
+      document.getElementById('tabContacted').classList.toggle('active', filter === 'CONTACTED');
+      renderTable();
+    }
+
+    function renderTable() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const dateFilter = document.getElementById('dateFilterSelect').value;
+      const tbody = document.getElementById('ordersTbody');
+
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const startOfYesterday = startOfToday - (24 * 60 * 60 * 1000);
+      const startOfWeek = startOfToday - (7 * 24 * 60 * 60 * 1000);
+
+      let filtered = allOrders.filter(o => {
+        // Status filter
+        if (currentFilter === 'PAID' && o.status !== 'PAID') return false;
+        if (currentFilter === 'ABANDONED' && o.status !== 'ABANDONED') return false;
+        if (currentFilter === 'CONTACTED' && (o.contacted !== true && o.status !== 'CONTACTED')) return false;
+
+        // Date filter
+        const orderTime = new Date(o.date).getTime();
+        if (dateFilter === 'TODAY' && orderTime < startOfToday) return false;
+        if (dateFilter === 'YESTERDAY' && (orderTime < startOfYesterday || orderTime >= startOfToday)) return false;
+        if (dateFilter === 'WEEK' && orderTime < startOfWeek) return false;
+
+        // Search text
+        if (search) {
+          const hay = `${o.name || ''} ${o.email || ''} ${o.phone || ''} ${o.id || ''} ${o.payment_id || ''}`.toLowerCase();
+          return hay.includes(search);
+        }
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 48px 20px; color: var(--text-muted);">
+              <div style="font-size: 1.5rem; margin-bottom: 8px;">🔍</div>
+              No orders or leads found matching this filter.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      const storeUrl = getStoreUrl();
+
+      tbody.innerHTML = filtered.map(o => {
+        const isPaid = o.status === 'PAID';
+        const isContacted = Boolean(o.contacted) || o.status === 'CONTACTED';
+        const dateObj = new Date(o.date);
+        const dateStr = dateObj.toLocaleString('en-IN', {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        // Check if created today
+        const isToday = dateObj.getTime() >= startOfToday;
+
+        let cleanPhone = (o.phone || '').replace(/\D/g, '');
+        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+        const customerName = escapeHtml(o.name || 'Anonymous');
+        const orderAmt = o.amount || 1;
+        const waMsg = encodeURIComponent(
+          `Hey ${customerName}! 👋 Saw you were checking out the International Dropshipping Blueprint (₹${orderAmt}). Did your payment get interrupted? Here is the direct link: ${storeUrl}`
+        );
+        const waLink = `https://wa.me/${cleanPhone}?text=${waMsg}`;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 800; color: #fff; display: flex; align-items: center; gap: 6px;">
+                <span>${customerName}</span>
+                ${isToday ? '<span style="font-size: 0.65rem; background: #1e3a8a; color: #93c5fd; padding: 1px 6px; border-radius: 4px;">TODAY</span>' : ''}
+              </div>
+              <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">${o.id}</div>
+            </td>
+            <td>
+              <div style="color: #cbd5e1; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                <span>${escapeHtml(o.phone || 'No phone')}</span>
+                ${cleanPhone ? `<a href="tel:${cleanPhone}" class="action-icon-btn" title="Call Customer">📞</a>` : ''}
+              </div>
+              <div style="font-size: 0.75rem; color: #94a3b8; display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                <span>${escapeHtml(o.email || 'No email')}</span>
+                ${o.email ? `<a href="mailto:${escapeHtml(o.email)}" class="action-icon-btn" style="width: 20px; height: 20px; font-size: 0.68rem;" title="Send Email">✉️</a>` : ''}
+              </div>
+            </td>
+            <td style="color: #94a3b8; font-size: 0.8rem;">
+              <div>${dateStr}</div>
+              <div style="font-size: 0.7rem; color: #64748b;">${timeAgo(dateObj)}</div>
+            </td>
+            <td style="font-weight: 800; color: #fff;">
+              ₹${orderAmt}
+            </td>
+            <td>
+              <span 
+                class="status-badge ${isPaid ? 'status-paid' : (isContacted ? 'status-contacted' : 'status-abandoned')}"
+                onclick="toggleOrderStatus('${o.id}')"
+                title="Click to change status"
+              >
+                ${isPaid ? '● PAID' : (isContacted ? '💬 CONTACTED' : '⚠ ABANDONED')}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                ${!isPaid && cleanPhone ? `
+                  <a href="${waLink}" target="_blank" class="btn-wa-action" onclick="markOrderContacted('${o.id}')">
+                    <span>📲 WhatsApp</span>
+                  </a>
+                ` : isPaid ? `
+                  <span style="font-family: monospace; font-size: 0.78rem; color: #10b981; font-weight: 700;">
+                    ${escapeHtml(o.payment_id || 'Verified')}
+                  </span>
+                ` : `
+                  <span style="color: #64748b; font-size: 0.75rem;">No Phone</span>
+                `}
+
+                <button class="action-icon-btn" style="color: #f87171;" title="Delete Order" onclick="deleteOrder('${o.id}')">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Toggle Order Status
+    async function toggleOrderStatus(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const nextStatus = order.status === 'PAID' ? 'ABANDONED' : 'PAID';
+      order.status = nextStatus;
+      saveLocalCache();
+      renderTable();
+      recalculateLocalStats();
+
+      // Sync with server
+      try {
+        const passcode = getSavedPasscode();
+        await fetch(`${getApiBase()}/api/admin/orders/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+          body: JSON.stringify({ id: orderId, status: nextStatus })
+        });
+        showToast(`✓ Order status updated to ${nextStatus}`);
+      } catch (e) {}
+    }
+
+    async function markOrderContacted(orderId) {
+      const order = allOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      order.contacted = true;
+      saveLocalCache();
+      renderTable();
+
+      try {
+        const passcode = getSavedPasscode();
+        await fetch(`${getApiBase()}/api/admin/orders/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+          body: JSON.stringify({ id: orderId, contacted: true })
+        });
+      } catch (e) {}
+    }
+
+    async function deleteOrder(orderId) {
+      if (!confirm('Are you sure you want to delete this order?')) return;
+
+      allOrders = allOrders.filter(o => o.id !== orderId);
+      saveLocalCache();
+      renderTable();
+      recalculateLocalStats();
+
+      try {
+        const passcode = getSavedPasscode();
+        await fetch(`${getApiBase()}/api/admin/orders/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+          body: JSON.stringify({ id: orderId })
+        });
+        showToast('✓ Order deleted from database');
+      } catch (e) {}
+    }
+
+    async function submitManualOrder() {
+      const name = document.getElementById('manualName').value.trim();
+      const phone = document.getElementById('manualPhone').value.trim();
+      const email = document.getElementById('manualEmail').value.trim();
+      const status = document.getElementById('manualStatus').value;
+      const amount = Number(document.getElementById('manualAmount').value) || 199;
+      const payment_id = document.getElementById('manualPayId').value.trim();
+
+      const newOrder = {
+        id: `ord_${Date.now()}`,
+        name: name,
+        phone: phone,
+        email: email,
+        amount: amount,
+        status: status,
+        contacted: false,
+        payment_id: payment_id || (status === 'PAID' ? `manual_pay_${Date.now()}` : null),
+        date: new Date().toISOString()
+      };
+
+      allOrders.unshift(newOrder);
+      saveLocalCache();
+      renderTable();
+      recalculateLocalStats();
+      closeModal('modalAddOrder');
+
+      try {
+        const passcode = getSavedPasscode();
+        await fetch(`${getApiBase()}/api/admin/orders/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+          body: JSON.stringify(newOrder)
+        });
+        showToast('✓ Manual order created successfully');
+      } catch (e) {}
+    }
+
+    // Settings Management
+    function saveSettings() {
+      const storeInput = document.getElementById('settingStoreUrl').value.trim();
+      const apiInput = document.getElementById('settingApiUrl').value.trim();
+
+      adminSettings.customStoreUrl = storeInput;
+      adminSettings.customApiUrl = apiInput;
+
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(adminSettings));
+      } catch(e) {}
+
+      document.getElementById('activeStoreDomain').textContent = getStoreUrl();
+      saveCapiSettings();
+
+      showToast('✓ Settings updated');
+      renderTable();
     }
 
     async function loadCapiSettings() {
@@ -710,13 +1650,11 @@ Link: http://localhost:3000</div>
       if (!passcode) return;
 
       try {
-        const res = await fetch('/api/admin/capi-settings', {
+        const res = await fetch(`${getApiBase()}/api/admin/capi-settings`, {
           headers: { 'X-Admin-Passcode': passcode }
         });
         const data = await res.json();
         if (data.success) {
-          const pixelEl = document.getElementById('capiPixelIdDisplay');
-          if (pixelEl) pixelEl.textContent = data.pixel_id || '4879107795666392';
           const tokenInput = document.getElementById('capiAccessTokenInput');
           if (tokenInput && data.has_token) {
             tokenInput.placeholder = '● Token active & configured (paste to overwrite)';
@@ -726,19 +1664,16 @@ Link: http://localhost:3000</div>
             testInput.value = data.test_code;
           }
         }
-      } catch (e) {
-        console.warn('Error loading CAPI settings:', e.message);
-      }
+      } catch (e) {}
     }
 
     async function saveCapiSettings() {
       const passcode = getSavedPasscode();
       const token = document.getElementById('capiAccessTokenInput').value.trim();
       const testCode = document.getElementById('capiTestCodeInput').value.trim();
-      const statusEl = document.getElementById('capiSaveStatus');
 
       try {
-        const res = await fetch('/api/admin/capi-settings', {
+        await fetch(`${getApiBase()}/api/admin/capi-settings`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -749,29 +1684,17 @@ Link: http://localhost:3000</div>
             test_code: testCode
           })
         });
-        const data = await res.json();
-        if (data.success) {
-          statusEl.textContent = '✓ Saved successfully!';
-          statusEl.style.color = '#10b981';
-          setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3000);
-          loadCapiSettings();
-        } else {
-          statusEl.textContent = '❌ Failed to save';
-          statusEl.style.color = '#ef4444';
-        }
-      } catch (e) {
-        statusEl.textContent = '❌ Failed to save';
-        statusEl.style.color = '#ef4444';
-      }
+      } catch (e) {}
     }
 
-    async function testCapiEvent(eventName = 'Purchase') {
+    async function triggerCapiTest(eventName = 'Purchase') {
       const passcode = getSavedPasscode();
-      const resultEl = document.getElementById('capiTestResult');
-      resultEl.innerHTML = `<span style="color: #60a5fa;">⏳ Sending test ${eventName} event to Meta...</span>`;
+      const consoleEl = document.getElementById('capiConsole');
+      consoleEl.style.display = 'block';
+      consoleEl.textContent = `> Sending test ${eventName} event to Meta Graph API v19.0...\n`;
 
       try {
-        const res = await fetch('/api/admin/capi-test', {
+        const res = await fetch(`${getApiBase()}/api/admin/capi-test`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -780,120 +1703,108 @@ Link: http://localhost:3000</div>
           body: JSON.stringify({ event_name: eventName })
         });
         const data = await res.json();
-        if (data.skipped) {
-          resultEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Notice: Please paste your Meta CAPI Access Token first, then click Save.</span>';
-        } else if (data.success) {
-          resultEl.innerHTML = `<span style="color: #10b981;">✅ Meta accepted ${eventName} event! Events Received: ${data.data?.events_received || 1}</span>`;
-        } else {
-          const errMsg = data.data?.error?.message || data.error || 'Meta returned error';
-          resultEl.innerHTML = '<span style="color: #ef4444;">❌ ' + escapeHtml(errMsg) + '</span>';
-        }
+        consoleEl.textContent += `> Response [HTTP ${res.status}]:\n` + JSON.stringify(data, null, 2);
       } catch (e) {
-        resultEl.innerHTML = '<span style="color: #ef4444;">❌ Request failed: ' + escapeHtml(e.message) + '</span>';
+        consoleEl.textContent += `> Request Failed: ${e.message}`;
       }
     }
 
-    function updateStats(stats) {
-      document.getElementById('statRevenue').textContent = `₹${(stats.totalRevenue || 0).toLocaleString('en-IN')}`;
-      document.getElementById('statPaid').textContent = stats.paidCount || 0;
-      document.getElementById('statAbandoned').textContent = stats.abandonedCount || 0;
-      document.getElementById('statConversion').textContent = `${stats.conversionRate || 0}%`;
+    // Auto-Refresh
+    function startAutoRefresh() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      if (countdownInterval) clearInterval(countdownInterval);
 
-      document.getElementById('countAll').textContent = stats.totalOrders || 0;
-      document.getElementById('countPaid').textContent = stats.paidCount || 0;
-      document.getElementById('countAbandoned').textContent = stats.abandonedCount || 0;
-    }
-
-    function setFilter(filter) {
-      currentFilter = filter;
-      document.getElementById('tabAll').classList.toggle('active', filter === 'ALL');
-      document.getElementById('tabPaid').classList.toggle('active', filter === 'PAID');
-      document.getElementById('tabAbandoned').classList.toggle('active', filter === 'ABANDONED');
-      renderTable();
-    }
-
-    function renderTable() {
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
-      const tbody = document.getElementById('ordersTbody');
-
-      let filtered = allOrders.filter(o => {
-        if (currentFilter !== 'ALL' && o.status !== currentFilter) return false;
-        if (search) {
-          const hay = `${o.name} ${o.email} ${o.phone}`.toLowerCase();
-          return hay.includes(search);
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
-              No orders found matching this filter.
-            </td>
-          </tr>
-        `;
+      if (refreshIntervalMs <= 0) {
+        document.getElementById('autoRefreshCountdown').textContent = 'Auto-sync: Off';
         return;
       }
 
-      tbody.innerHTML = filtered.map(o => {
-        const isPaid = o.status === 'PAID';
-        const dateStr = new Date(o.date).toLocaleString('en-IN', {
-          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
+      countdownSecs = Math.floor(refreshIntervalMs / 1000);
+      countdownInterval = setInterval(() => {
+        countdownSecs--;
+        if (countdownSecs <= 0) countdownSecs = Math.floor(refreshIntervalMs / 1000);
+        const cdEl = document.getElementById('autoRefreshCountdown');
+        if (cdEl) cdEl.textContent = `Auto-sync: ${countdownSecs}s`;
+      }, 1000);
 
-        // Clean phone for WhatsApp link
-        let cleanPhone = (o.phone || '').replace(/\D/g, '');
-        if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-
-        const waText = encodeURIComponent(
-          `Hey ${o.name || 'there'}! 👋 Saw you were checking out the International Dropshipping Blueprint (₹199). Did your payment get interrupted? Here is the direct link: https://intdropshippingcourse.vercel.app`
-        );
-        const waLink = `https://wa.me/${cleanPhone}?text=${waText}`;
-
-        return `
-          <tr>
-            <td>
-              <div style="font-weight: 700; color: #fff;">${escapeHtml(o.name || 'Anonymous')}</div>
-              <div style="font-size: 0.72rem; color: #64748b; font-family: monospace;">${o.id}</div>
-            </td>
-            <td>
-              <div style="color: #cbd5e1;">${escapeHtml(o.phone || 'No phone')}</div>
-              <div style="font-size: 0.75rem; color: #94a3b8;">${escapeHtml(o.email || 'No email')}</div>
-            </td>
-            <td style="color: #94a3b8; font-size: 0.8rem;">
-              ${dateStr}
-            </td>
-            <td style="font-weight: 800; color: #fff;">
-              ₹${o.amount || 199}
-            </td>
-            <td>
-              <span class="status-badge ${isPaid ? 'status-paid' : 'status-abandoned'}">
-                ${isPaid ? '● PAID' : '⚠ ABANDONED'}
-              </span>
-            </td>
-            <td>
-              ${isPaid 
-                ? `<span style="font-family: monospace; font-size: 0.78rem; color: #10b981;">${escapeHtml(o.payment_id || 'Verified')}</span>`
-                : cleanPhone 
-                  ? `<a href="${waLink}" target="_blank" class="wa-btn">📲 WhatsApp Follow-Up</a>`
-                  : `<span style="color: #64748b; font-size: 0.75rem;">No phone provided</span>`
-              }
-            </td>
-          </tr>
-        `;
-      }).join('');
+      autoRefreshTimer = setInterval(() => {
+        loadOrders(false);
+      }, refreshIntervalMs);
     }
 
-    function copyText(elemId) {
-      const text = document.getElementById(elemId).textContent;
-      navigator.clipboard.writeText(text);
-      alert('Message copied to clipboard!');
+    function changeAutoRefreshInterval(val) {
+      refreshIntervalMs = Number(val);
+      startAutoRefresh();
+    }
+
+    // Backup & Restore
+    function downloadJsonBackup() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allOrders, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `dropship_orders_backup_${Date.now()}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+      showToast('✓ Backup downloaded');
+    }
+
+    function handleImportJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) throw new Error('File does not contain an array of orders');
+
+          const orderMap = new Map();
+          for (let o of allOrders) { if (o.id) orderMap.set(o.id, o); }
+          for (let o of imported) { if (o.id) orderMap.set(o.id, o); }
+
+          allOrders = Array.from(orderMap.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+          saveLocalCache();
+          renderTable();
+          recalculateLocalStats();
+
+          // Push to server
+          const passcode = getSavedPasscode();
+          await fetch(`${getApiBase()}/api/admin/orders/sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+            body: JSON.stringify({ orders: allOrders })
+          });
+
+          showToast(`✓ Successfully imported ${imported.length} orders`);
+          closeModal('modalBackup');
+        } catch (err) {
+          alert('Failed to import JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    async function syncBrowserCacheToServer() {
+      try {
+        const passcode = getSavedPasscode();
+        const res = await fetch(`${getApiBase()}/api/admin/orders/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+          body: JSON.stringify({ orders: allOrders })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast(`✓ Synced ${data.count} orders to server database`);
+        }
+      } catch (e) {
+        alert('Sync error: ' + e.message);
+      }
     }
 
     function exportCsv() {
       if (!allOrders.length) { alert('No orders to export.'); return; }
-      const headers = ['Order ID', 'Name', 'Phone', 'Email', 'Amount', 'Status', 'Payment ID', 'Date'];
+      const headers = ['Order ID', 'Name', 'Phone', 'Email', 'Amount', 'Status', 'Payment ID', 'Contacted', 'Date'];
       const rows = allOrders.map(o => [
         o.id,
         `"${(o.name||'').replace(/"/g, '""')}"`,
@@ -902,6 +1813,7 @@ Link: http://localhost:3000</div>
         o.amount || 199,
         o.status,
         `"${o.payment_id||''}"`,
+        o.contacted ? 'Yes' : 'No',
         `"${o.date}"`
       ]);
 
@@ -913,6 +1825,61 @@ Link: http://localhost:3000</div>
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      showToast('✓ CSV Exported');
+    }
+
+    // UI Helpers
+    function toggleAccordion(id) {
+      const el = document.getElementById(id);
+      const icon = document.getElementById(id + 'Icon');
+      if (el.style.display === 'none') {
+        el.style.display = 'block';
+        if (icon) icon.textContent = '▲ Click to Collapse';
+      } else {
+        el.style.display = 'none';
+        if (icon) icon.textContent = '▼ Click to Expand';
+      }
+    }
+
+    function copyTemplateText(elemId) {
+      let text = document.getElementById(elemId).textContent;
+      text = text.replace(/\[STORE_URL\]/g, getStoreUrl());
+      navigator.clipboard.writeText(text);
+      showToast('✓ Message copied to clipboard!');
+    }
+
+    function visitStore() {
+      window.open(getStoreUrl(), '_blank');
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('open');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('open');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotice');
+      const msgEl = document.getElementById('toastMsg');
+      if (!toast || !msgEl) return;
+      msgEl.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'Just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
     }
 
     function escapeHtml(str) {
@@ -921,9 +1888,8 @@ Link: http://localhost:3000</div>
       );
     }
 
-    // Check authentication on open & refresh orders every 10 seconds if authenticated
+    // Initialize Auth & App
     checkAuth();
-    setInterval(loadOrders, 10000);
   </script>
 
 </body>
