@@ -119,7 +119,7 @@ function sendMetaCapiEvent(eventName, eventId, { name, email, phone, amount, cur
         user_data: userData,
         custom_data: {
           currency: currency || 'INR',
-          value: Number(amount) || 1.00,
+          value: Number(amount) || 199.00,
           content_name: 'International Dropshipping Blueprint (PDF + 5 Bonuses)',
           content_type: 'product'
         }
@@ -335,7 +335,7 @@ async function handleRequest(req, res) {
       name: (data.name || '').trim() || 'Guest',
       email: (data.email || '').trim(),
       phone: (data.phone || '').trim(),
-      amount: data.amount ? Number(data.amount) : 1,
+      amount: data.amount ? Number(data.amount) : 199,
       status: 'ABANDONED', // Starts as Abandoned until payment completes
       contacted: false,
       payment_id: null,
@@ -350,7 +350,7 @@ async function handleRequest(req, res) {
       name: newOrder.name,
       email: newOrder.email,
       phone: newOrder.phone,
-      amount: newOrder.amount || 1.00,
+      amount: newOrder.amount || 199.00,
       test_code: data.test_code
     }, req).catch(err => console.warn('CAPI InitiateCheckout note:', err.message));
 
@@ -383,7 +383,7 @@ async function handleRequest(req, res) {
         name: data.name || 'Customer',
         email: data.email || '',
         phone: data.phone || '',
-        amount: data.amount ? Number(data.amount) : 1,
+        amount: data.amount ? Number(data.amount) : 199,
         status: 'PAID',
         contacted: false,
         payment_id: data.payment_id || `pay_${Date.now()}`,
@@ -399,7 +399,7 @@ async function handleRequest(req, res) {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      amount: data.amount ? Number(data.amount) : 1.00,
+      amount: data.amount ? Number(data.amount) : 199.00,
       test_code: data.test_code
     }, req).catch(err => console.warn('CAPI Purchase note:', err.message));
 
@@ -420,14 +420,14 @@ async function handleRequest(req, res) {
     const paidOrders = orders.filter(o => o.status === 'PAID');
     const abandonedOrders = orders.filter(o => o.status === 'ABANDONED');
     const contactedOrders = orders.filter(o => o.contacted === true || o.status === 'CONTACTED');
-    const totalRevenue = paidOrders.reduce((sum, o) => sum + (Number(o.amount) || 1), 0);
+    const totalRevenue = paidOrders.reduce((sum, o) => sum + (Number(o.amount) || 199), 0);
 
     // Calculate Today's Stats
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const todayOrders = orders.filter(o => new Date(o.date).getTime() >= startOfToday);
     const todayPaid = todayOrders.filter(o => o.status === 'PAID');
-    const todayRevenue = todayPaid.reduce((sum, o) => sum + (Number(o.amount) || 1), 0);
+    const todayRevenue = todayPaid.reduce((sum, o) => sum + (Number(o.amount) || 199), 0);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -438,7 +438,7 @@ async function handleRequest(req, res) {
         abandonedCount: abandonedOrders.length,
         contactedCount: contactedOrders.length,
         totalRevenue: totalRevenue,
-        recoverableRevenue: abandonedOrders.reduce((sum, o) => sum + (Number(o.amount) || 1), 0),
+        recoverableRevenue: abandonedOrders.reduce((sum, o) => sum + (Number(o.amount) || 199), 0),
         conversionRate: orders.length > 0 ? ((paidOrders.length / orders.length) * 100).toFixed(1) : 0,
         todayCount: todayOrders.length,
         todayPaidCount: todayPaid.length,
