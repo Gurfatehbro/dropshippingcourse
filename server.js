@@ -11,10 +11,6 @@ const CAPI_CONFIG_FILE = isVercel ? path.join('/tmp', 'capi_config.json') : path
 
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'dropshippingadmin';
 
-// Upstash / Vercel KV optional environment variables
-const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '';
-const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '';
-
 function readCapiConfig() {
   try {
     if (!fs.existsSync(CAPI_CONFIG_FILE)) {
@@ -29,7 +25,9 @@ function readCapiConfig() {
       const defaultCfg = {
         pixel_id: process.env.FB_PIXEL_ID || '4879107795666392',
         access_token: process.env.FB_ACCESS_TOKEN || 'EAAdOWKUvli0BSivPSn2YSZBOEKxsr71ZCQtWhH9SQhpa6CPPjftvtHqYPLwxds1evdaIkTZBk2mLn1vsYQXZBKpVZAiVvIO2NpIKDIxEEtAi28GfrZAd9fYAHFuscrWFI7nAW0oZA6xoqMmUUQP7vZCBPFUNvWaE2YRwLqkB1t1XdPsa9bmcjDrdxHGsZA9eZB2wZDZD',
-        test_code: process.env.FB_TEST_CODE || 'TEST69070'
+        test_code: process.env.FB_TEST_CODE || 'TEST69070',
+        kv_url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '',
+        kv_token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || ''
       };
       try {
         fs.writeFileSync(CAPI_CONFIG_FILE, JSON.stringify(defaultCfg, null, 2), 'utf8');
@@ -41,7 +39,9 @@ function readCapiConfig() {
     return {
       pixel_id: '4879107795666392',
       access_token: 'EAAdOWKUvli0BSivPSn2YSZBOEKxsr71ZCQtWhH9SQhpa6CPPjftvtHqYPLwxds1evdaIkTZBk2mLn1vsYQXZBKpVZAiVvIO2NpIKDIxEEtAi28GfrZAd9fYAHFuscrWFI7nAW0oZA6xoqMmUUQP7vZCBPFUNvWaE2YRwLqkB1t1XdPsa9bmcjDrdxHGsZA9eZB2wZDZD',
-      test_code: 'TEST69070'
+      test_code: 'TEST69070',
+      kv_url: process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '',
+      kv_token: process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || ''
     };
   }
 }
@@ -52,6 +52,13 @@ function saveCapiConfig(cfg) {
   } catch (e) {
     console.error('Error saving capi config:', e.message);
   }
+}
+
+function getKvCredentials() {
+  const cfg = readCapiConfig();
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || cfg.kv_url || '';
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || cfg.kv_token || '';
+  return { url: url.trim().replace(/\/$/, ''), token: token.trim() };
 }
 
 function hashSha256(str) {
@@ -187,7 +194,31 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
-function readOrders() {
+async function readOrders() {
+  const { url: kvUrl, token: kvToken } = getKvCredentials();
+
+  // 1. Try reading from Upstash Redis / Vercel KV if configured
+  if (kvUrl && kvToken) {
+    try {
+      const getRes = await fetch(`${kvUrl}/get/dropship_orders`, {
+        headers: { 'Authorization': `Bearer ${kvToken}` },
+        signal: AbortSignal.timeout(3000)
+      });
+      if (getRes.ok) {
+        const kvData = await getRes.json();
+        if (kvData && kvData.result) {
+          const parsed = JSON.parse(kvData.result);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('KV read note:', e.message);
+    }
+  }
+
+  // 2. Read from local filesystem
   try {
     if (!fs.existsSync(ORDERS_FILE)) {
       const seedFile = path.join(__dirname, 'orders.json');
@@ -209,36 +240,31 @@ function readOrders() {
   }
 }
 
-function saveOrders(orders) {
+async function saveOrders(orders) {
+  // 1. Save locally to file
   try {
     fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2), 'utf8');
   } catch (e) {
     console.error('Error saving orders locally:', e.message);
   }
 
-  // If Upstash/Vercel KV REST is configured, sync asynchronously
-  if (KV_URL && KV_TOKEN) {
-    syncOrdersToKv(orders).catch(err => console.warn('KV sync error:', err.message));
+  // 2. Sync to Upstash Redis / Vercel KV if configured
+  const { url: kvUrl, token: kvToken } = getKvCredentials();
+  if (kvUrl && kvToken) {
+    try {
+      await fetch(`${kvUrl}/set/dropship_orders`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${kvToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(orders),
+        signal: AbortSignal.timeout(3000)
+      });
+    } catch (e) {
+      console.warn('KV save note:', e.message);
+    }
   }
-}
-
-async function syncOrdersToKv(orders) {
-  try {
-    const url = `${KV_URL.replace(/\/$/, '')}/set/dropship_orders`;
-    const payload = JSON.stringify({ value: JSON.stringify(orders) });
-    const postReq = https.request(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${KV_TOKEN}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      },
-      timeout: 3000
-    });
-    postReq.on('error', () => {});
-    postReq.write(payload);
-    postReq.end();
-  } catch (e) {}
 }
 
 function parseBody(req) {
@@ -268,7 +294,6 @@ function parseBody(req) {
 function getSanitizedPath(req) {
   if (req.endpoint) return req.endpoint;
 
-  // Determine path from all possible environments (Vercel, AWS Lambda, Node server)
   const candidate = req.url || 
                     req.headers['x-invoke-path'] || 
                     req.headers['x-matched-path'] || 
@@ -311,13 +336,15 @@ async function handleRequest(req, res) {
 
   // Health Check & Diagnostic API
   if (reqPath === '/api/admin/health' || reqPath.endsWith('/admin/health')) {
-    const orders = readOrders();
+    const orders = await readOrders();
+    const { url: kvUrl } = getKvCredentials();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       success: true,
       status: 'healthy',
       environment: isVercel ? 'Vercel Serverless' : 'Local Node.js',
       detectedHost: req.headers.host || 'unknown',
+      hasCloudKv: Boolean(kvUrl),
       orderCount: orders.length,
       timestamp: new Date().toISOString()
     }));
@@ -327,7 +354,7 @@ async function handleRequest(req, res) {
   // API 1: Initiate Order / Record Abandoned Lead & Trigger CAPI InitiateCheckout
   if ((reqPath === '/api/order/initiate' || reqPath.endsWith('/order/initiate')) && req.method === 'POST') {
     const data = await parseBody(req);
-    const orders = readOrders();
+    const orders = await readOrders();
 
     const newOrder = {
       id: `ord_${Date.now()}`,
@@ -343,7 +370,7 @@ async function handleRequest(req, res) {
     };
 
     orders.unshift(newOrder);
-    saveOrders(orders);
+    await saveOrders(orders);
 
     // Trigger Meta Conversions API (CAPI) InitiateCheckout
     sendMetaCapiEvent('InitiateCheckout', data.eventId, {
@@ -362,7 +389,7 @@ async function handleRequest(req, res) {
   // API 2: Mark Order as Paid & Trigger CAPI Purchase
   if ((reqPath === '/api/order/complete' || reqPath.endsWith('/order/complete')) && req.method === 'POST') {
     const data = await parseBody(req);
-    const orders = readOrders();
+    const orders = await readOrders();
 
     let updated = false;
     for (let ord of orders) {
@@ -392,7 +419,7 @@ async function handleRequest(req, res) {
       });
     }
 
-    saveOrders(orders);
+    await saveOrders(orders);
 
     // Trigger Meta Conversions API (CAPI) Purchase
     sendMetaCapiEvent('Purchase', data.eventId, {
@@ -416,7 +443,7 @@ async function handleRequest(req, res) {
       return;
     }
 
-    const orders = readOrders();
+    const orders = await readOrders();
     const paidOrders = orders.filter(o => o.status === 'PAID');
     const abandonedOrders = orders.filter(o => o.status === 'ABANDONED');
     const contactedOrders = orders.filter(o => o.contacted === true || o.status === 'CONTACTED');
@@ -458,7 +485,7 @@ async function handleRequest(req, res) {
     }
 
     const data = await parseBody(req);
-    const orders = readOrders();
+    const orders = await readOrders();
     const target = orders.find(o => o.id === data.id);
 
     if (!target) {
@@ -474,7 +501,7 @@ async function handleRequest(req, res) {
     if (data.email) target.email = data.email;
     if (data.payment_id) target.payment_id = data.payment_id;
 
-    saveOrders(orders);
+    await saveOrders(orders);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, order: target }));
@@ -490,7 +517,7 @@ async function handleRequest(req, res) {
     }
 
     const data = await parseBody(req);
-    const orders = readOrders();
+    const orders = await readOrders();
 
     const manualOrder = {
       id: `ord_${Date.now()}`,
@@ -506,7 +533,7 @@ async function handleRequest(req, res) {
     };
 
     orders.unshift(manualOrder);
-    saveOrders(orders);
+    await saveOrders(orders);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, order: manualOrder }));
@@ -522,7 +549,7 @@ async function handleRequest(req, res) {
     }
 
     const data = await parseBody(req);
-    let orders = readOrders();
+    let orders = await readOrders();
     const initialLen = orders.length;
     orders = orders.filter(o => o.id !== data.id);
 
@@ -532,7 +559,7 @@ async function handleRequest(req, res) {
       return;
     }
 
-    saveOrders(orders);
+    await saveOrders(orders);
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, message: 'Order deleted' }));
     return;
@@ -548,15 +575,13 @@ async function handleRequest(req, res) {
 
     const data = await parseBody(req);
     const newItems = Array.isArray(data.orders) ? data.orders : [];
-    let currentOrders = readOrders();
+    let currentOrders = await readOrders();
     const map = new Map();
 
-    // Preserve existing orders
     for (let ord of currentOrders) {
       if (ord.id) map.set(ord.id, ord);
     }
 
-    // Merge incoming orders
     for (let ord of newItems) {
       if (ord.id) {
         map.set(ord.id, Object.assign({}, map.get(ord.id) || {}, ord));
@@ -564,14 +589,14 @@ async function handleRequest(req, res) {
     }
 
     const merged = Array.from(map.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
-    saveOrders(merged);
+    await saveOrders(merged);
 
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true, count: merged.length }));
     return;
   }
 
-  // API 8: Get & Update Meta CAPI Settings
+  // API 8: Get & Update Meta CAPI Settings & KV settings
   if (reqPath === '/api/admin/capi-settings' || reqPath.endsWith('/admin/capi-settings')) {
     if (!isAuthorized(req)) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
@@ -581,12 +606,15 @@ async function handleRequest(req, res) {
 
     if (req.method === 'GET') {
       const cfg = readCapiConfig();
+      const { url: kvUrl } = getKvCredentials();
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         success: true,
         pixel_id: cfg.pixel_id || '4879107795666392',
         has_token: Boolean(cfg.access_token),
-        test_code: cfg.test_code || ''
+        test_code: cfg.test_code || '',
+        kv_url: kvUrl || '',
+        has_kv_token: Boolean(cfg.kv_token || process.env.KV_REST_API_TOKEN)
       }));
       return;
     }
@@ -597,6 +625,8 @@ async function handleRequest(req, res) {
       if (data.pixel_id) cfg.pixel_id = data.pixel_id.trim();
       if (data.access_token !== undefined) cfg.access_token = data.access_token.trim();
       if (data.test_code !== undefined) cfg.test_code = data.test_code.trim();
+      if (data.kv_url !== undefined) cfg.kv_url = data.kv_url.trim();
+      if (data.kv_token !== undefined) cfg.kv_token = data.kv_token.trim();
       saveCapiConfig(cfg);
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -628,7 +658,7 @@ async function handleRequest(req, res) {
     return;
   }
 
-  // If request begins with /api/ and wasn't handled, return a clean 404 JSON response
+  // If request begins with /api/ and wasn't handled, return clean 404 JSON
   if (reqPath.startsWith('/api/')) {
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: false, error: `Endpoint not found: ${reqPath}` }));

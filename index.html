@@ -903,6 +903,25 @@
         if (initData.success) {
           currentServerOrderId = initData.orderId;
         }
+
+        // Cache lead locally for instant admin sync
+        try {
+          const cacheKey = 'dropship_admin_orders_cache';
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+          cached.unshift({
+            id: currentServerOrderId || `ord_${Date.now()}`,
+            order_id: `lead_${(phone || '').replace(/\D/g, '') || Date.now()}`,
+            name: name,
+            email: email,
+            phone: phone,
+            amount: 199,
+            status: 'ABANDONED',
+            contacted: false,
+            payment_id: null,
+            date: new Date().toISOString()
+          });
+          localStorage.setItem(cacheKey, JSON.stringify(cached));
+        } catch (cacheErr) {}
       } catch (e) {
         console.warn('Order initiate note:', e.message);
       }
@@ -974,6 +993,7 @@
                   name: name,
                   email: email,
                   phone: phone,
+                  amount: 199,
                   payment_id: response.razorpay_payment_id,
                   eventId: purchaseEventId,
                   test_code: testCode
@@ -982,6 +1002,30 @@
             } catch (e) {
               console.warn('Order complete mark note:', e.message);
             }
+
+            // Immediately mark order as PAID in shared local cache
+            try {
+              const cacheKey = 'dropship_admin_orders_cache';
+              const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+              const matched = cached.find(o => (currentServerOrderId && o.id === currentServerOrderId) || (o.phone && o.phone === phone));
+              if (matched) {
+                matched.status = 'PAID';
+                matched.payment_id = response.razorpay_payment_id;
+              } else {
+                cached.unshift({
+                  id: currentServerOrderId || `ord_${Date.now()}`,
+                  name: name,
+                  email: email,
+                  phone: phone,
+                  amount: 199,
+                  status: 'PAID',
+                  contacted: false,
+                  payment_id: response.razorpay_payment_id,
+                  date: new Date().toISOString()
+                });
+              }
+              localStorage.setItem(cacheKey, JSON.stringify(cached));
+            } catch (cErr) {}
 
             finishOrder(name, email, response.razorpay_payment_id);
           },

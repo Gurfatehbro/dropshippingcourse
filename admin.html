@@ -1338,10 +1338,22 @@ Send screenshot here once completed to receive your PDF + 5 bonuses instantly.</
           for (let o of allOrders) { if (o.id) orderMap.set(o.id, o); }
           for (let o of (data.orders || [])) { if (o.id) orderMap.set(o.id, o); }
 
-          allOrders = Array.from(orderMap.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+          const merged = Array.from(orderMap.values()).sort((a, b) => new Date(b.date) - new Date(a.date));
+          const hasNewLocalOrders = merged.length > (data.orders || []).length;
+          allOrders = merged;
           saveLocalCache();
 
+          // If local cache had orders the server container was missing, push them to server immediately!
+          if (hasNewLocalOrders) {
+            fetch(`${getApiBase()}/api/admin/orders/sync`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'X-Admin-Passcode': passcode },
+              body: JSON.stringify({ orders: allOrders })
+            }).catch(() => {});
+          }
+
           updateStats(data.stats);
+          recalculateLocalStats(); // Ensures stats always include any newly merged local orders
           renderTable();
 
           if (isManual) showToast('✓ Synced with live server database');
