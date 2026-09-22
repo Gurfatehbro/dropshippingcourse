@@ -413,6 +413,13 @@ async function handleRequest(req, res) {
     return;
   }
 
+  // If running on Vercel and not an API route, return 404 JSON (Vercel CDN serves static files)
+  if (isVercel) {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, error: 'Endpoint not found' }));
+    return;
+  }
+
   // Static File Serving & Admin Route (Local Server)
   let targetPath = reqPath;
   if (targetPath === '/' || targetPath === '') {
